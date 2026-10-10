@@ -1,0 +1,139 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MangoDash Admin</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gridstack@10/dist/gridstack.min.css">
+<link rel="stylesheet" href="/css/dash.css">
+<link rel="manifest" href="/manifest.json"></head>
+<body class="admin-body">
+<div style="display:flex;justify-content:space-between;align-items:center">
+  <h2>&#129389; MangoDash Admin</h2>
+  <div><span id="whoami"></span> <button onclick="window.open('/connect.html','_blank','noopener')" title="Google sign-in for education widgets">&#127891; Connections</button> <button onclick="logout()">Log out</button></div>
+</div>
+  <!-- Backup / Restore Controls -->
+  <div id="backupRestoreBar" style="margin:12px 0;">
+    <button onclick="doBackup()">Backup Now</button>
+    <select id="restoreSelect" style="margin-left:10px;"></select>
+    <button onclick="doRestore()">Restore</button>
+  </div>
+<p>Household pair code (for displays &amp; e-ink /lite): <b id="paircode" style="color:#e8760e;font-size:1.3rem"></b></p>
+
+<h3>Dashboard Editor</h3>
+<div>
+  Dashboard: <select id="dashSel" onchange="loadDash()"></select>
+  <button onclick="newDash()">+ New</button>
+  Theme: <select id="theme"><option>dark</option><option>light</option></select>
+  Add widget:
+  <select id="wtype">
+    <optgroup label="&#128197; Calendar &amp; Time">
+      <option value="calendar">Calendar</option>
+      <option value="calendar3">Calendar (3-day)</option>
+      <option value="calendarmulti">Calendar (multi-feed)</option>
+      <option value="clock">Clock</option>
+      <option value="clocktimeline">Clock Timeline</option>
+      <option value="clocktimeline_alt">Clock Timeline (alt)</option>
+      <option value="coindice">Coincidence</option>
+      <option value="countdown">Countdown</option>
+    </optgroup>
+    <optgroup label="&#127891; Education">
+      <option value="classroom">Google Classroom</option>
+      <option value="gmail">School Mail (Gmail)</option>
+      <option value="gdocs">Google Docs</option>
+      <option value="launcher">App Launcher</option>
+      <option value="alma">Alma</option>
+      <option value="parentsquare">ParentSquare</option>
+      <option value="duolingo">Duolingo</option>
+      <option value="solitaire">Solitaire</option>
+      <option value="minesweeper">Minesweeper</option>
+    </optgroup>
+    <optgroup label="&#127780; Weather">
+      <option value="weather">Weather</option>
+      <option value="weather10">Weather (10-day)</option>
+      <option value="weathercloud">Weather Cloud</option>
+      <option value="weatherhourly">Weather (hourly)</option>
+      <option value="weathermap">Weather Map</option>
+    </optgroup>
+    <optgroup label="&#127916; Media">
+      <option value="movies">Movies</option>
+      <option value="streamnow">Streaming Now</option>
+      <option value="spotify">Spotify</option>
+      <option value="spotify_iframe">Spotify (iframe)</option>
+      <option value="spotify_playlist_selector">Spotify Playlist Selector</option>
+      <option value="jukebox">Jukebox</option>
+      <option value="youtube">YouTube</option>
+      <option value="camera">Camera</option>
+      <option value="photos">Photos</option>
+      <option value="gphotos">Google Photos</option>
+    </optgroup>
+    <optgroup label="&#127968; Home &amp; Family">
+      <option value="announce">Announcements</option>
+      <option value="askhouse">Ask the House</option>
+      <option value="auction">Auction</option>
+      <option value="birthdays">Birthdays</option>
+      <option value="chorechart">Chore Chart</option>
+      <option value="grocery">Grocery</option>
+      <option value="kudos">Kudos</option>
+      <option value="meals">Meals</option>
+      <option value="packages">Packages</option>
+      <option value="recipe">Recipe</option>
+      <option value="routine">Routine</option>
+      <option value="screentime">Screen Time</option>
+      <option value="standup">Today's Lineup</option>
+      <option value="todo">To-Do</option>
+    </optgroup>
+    <optgroup label="&#128240; News &amp; Info">
+      <option value="newsvisual">News (visual)</option>
+      <option value="sports">Sports</option>
+      <option value="departures">Departures</option>
+      <option value="joke">Joke</option>
+      <option value="quote">Quote</option>
+      <option value="docs">Docs (local)</option>
+      <option value="embed">Embed</option>
+      <option value="lakelevel">Lake Level</option>
+      <option value="stocks">Stocks</option>
+    </optgroup>
+  </select>
+  <button onclick="addWidget()">Add</button>
+  <button onclick="save()" style="background:#2e9e44">Save &amp; Push</button>
+</div>
+<div id="pageBar">
+  Pages: <span id="pageTabs"></span>
+  <button onclick="addPage()">+ Page</button>
+  <button onclick="delPage()">Delete Page</button>
+  &nbsp;|&nbsp; Show this page for <input id="pageSecs" type="number" min="0" style="width:70px"> seconds
+  <small>(only used when the dashboard has 2+ pages; min 5s)</small>
+</div>
+<div class="grid-stack" id="gs"></div>
+
+<h3>Approval Queue</h3><div id="approvals"></div>
+<h3>Family Members</h3>
+<input id="mName" placeholder="Name"><input id="mAvatar" placeholder="Emoji" size="4" value="&#128578;">
+<input id="mColor" type="color" value="#e8760e">
+<select id="mRole"><option>kid</option><option>parent</option></select>
+<input id="mPin" placeholder="PIN (optional)" size="6">
+<button onclick="addMember()">Add</button><div id="members"></div>
+<h3>Chores</h3>
+<input id="cTitle" placeholder="Chore title"><select id="cMember"></select>
+<input id="cPts" type="number" value="10" style="width:60px"> pts
+<input id="cMin" type="number" value="0" style="width:60px"> scr-min
+<select id="cSched"><option>daily</option><option>weekdays</option><option>weekly:Mon</option><option>weekly:Sat</option><option>once</option></select>
+<label><input id="cRotate" type="checkbox">rotate</label>
+<label><input id="cBounty" type="checkbox">bounty</label>
+<button onclick="addChore()">Add</button><div id="chores"></div>
+<h3>Packages</h3>
+<input id="pkgLabel" placeholder="Label (e.g. New shoes)">
+<input id="pkgNum" placeholder="Tracking number">
+<button onclick="addPackage()">Add</button><div id="pkgList"></div>
+<h3>Displays</h3><div id="devices"></div>
+<h3>Invites</h3>
+<button onclick="invite(false)">Invite to MY household</button>
+<span id="saTools" class="hidden"><button onclick="invite(true)">Invite NEW household (server admin)</button></span>
+<div id="inviteOut"></div>
+<div id="inviteList"></div>
+<h3>Photos</h3>
+<input type="file" id="photoFiles" multiple><button onclick="uploadPhotos()">Upload</button>
+<h3>Documents (PDFs / images for the docs widget)</h3>
+<input type="file" id="docFiles" multiple accept=".pdf,image/*"><button onclick="uploadDocs()">Upload</button>
+<div id="docList"></div>
+<script src="https://cdn.jsdelivr.net/npm/gridstack@10/dist/gridstack-all.js"></script>
+<script src="/js/admin.js"></script>
+</body></html>

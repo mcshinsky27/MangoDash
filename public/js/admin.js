@@ -1,0 +1,444 @@
+﻿let gs, dashes = [], currentId = null, membersCache = [];
+let layoutObj = null, pageIdx = 0;
+let dirtyPages = new Set();
+let pageLoading = false;
+
+async function api(u, m = "GET", b) {
+  const r = await fetch(u, { method: m, headers: { "Content-Type": "application/json" },
+    body: b ? JSON.stringify(b) : undefined });
+  if (r.status === 401) { location.href = "/login.html"; throw new Error("401"); }
+  return r.json();
+}
+async function logout() { await api("/api/logout", "POST"); location.href = "/login.html"; }
+
+function normalizeLayout(raw) {
+  let l;
+  if (Array.isArray(raw)) l = { v: 2, pages: [{ name: "Page 1", secs: 0, widgets: raw }] };
+  else if (raw && Array.isArray(raw.pages) && raw.pages.length) l = raw;
+  else l = { v: 2, pages: [{ name: "Page 1", secs: 0, widgets: [] }] };
+  l.pages.forEach((p, i) => { if (!p.id) p.id = "pg" + i; });
+  return l;
+}
+
+function defaults(t) {
+  return {
+    weather: { zip: "10001", unit: "F" },
+    weather10: { zip: "10001", unit: "F" },
+    weatherhourly: { zip: "10001", unit: "F", hours: 12 },
+    weathermap: { zip: "10001", overlay: "temp", zoom: 7 },
+    calendar: { url: "https://YOUR-ICS-URL", days: 14, max: 8, title: "Calendar" },
+    calendar3: { url: "https://YOUR-ICS-URL", title: "Next 3 Days" },
+    // Multi-view calendar: multiple color-coded ICS feeds (same named colors as
+    // the clocktimeline widgets), switchable day/3-day/5-day stacked schedule,
+    // 3-day/7-day column, 2-week/month views. defaultView sets the initial view;
+    // the widget's dropdown and legend chips let the end user switch views and
+    // toggle feeds on/off.
+    calendarmulti: {
+      title: "Calendar",
+      defaultView: "3sched",
+      calendars: [
+        { url: "https://YOUR-ICS-URL", name: "Work", color: "blue" },
+        { url: "https://YOUR-ICS-URL-2", name: "Family", color: "orange" }
+      ]
+    },
+    clocktimeline: {
+      calendars: [
+        { url: "https://YOUR-ICS-URL", name: "Work", color: "#3d9be9" },
+        { url: "https://YOUR-ICS-URL-2", name: "Family", color: "#e8760e" }
+      ],
+      horizonHours: 72
+    },
+    // Same JSON schema as the clocktimeline widget — both share one backend handler
+    // (/api/widget-data/clocktimeline), so configs are interchangeable.
+    clocktimeline_alt: {
+      calendars: [
+        { url: "https://YOUR-ICS-URL", name: "Work", color: "#3d9be9" },
+        { url: "https://YOUR-ICS-URL-2", name: "Family", color: "#e8760e" }
+      ],
+      horizonHours: 72,
+      dingInterval: 0
+    },
+    // ---- Education suite (household Google connection; see /connect.html) ----
+    classroom: { title: "Due Soon", days: 14 },
+    gmail: { title: "School Mail", max: 8 },
+    gdocs: { title: "Recent Docs" },
+    launcher: { title: "School Apps" },
+    // Alma / ParentSquare parse their digest emails out of the Gmail inbox
+    // (sender patterns configurable via ALMA_SENDER_PATTERNS / PARENTSQUARE_SENDER_PATTERNS in .env).
+    alma: { title: "Alma", max: 6 },
+    parentsquare: { title: "ParentSquare", max: 6 },
+    // Games: playable in a fullscreen modal; cols/rows/mines tune Minesweeper difficulty.
+    solitaire: { title: "Solitaire" },
+    minesweeper: { title: "Minesweeper", cols: 9, rows: 9, mines: 10 },
+    news: { url: "https://feeds.bbci.co.uk/news/rss.xml", max: 6 },
+    // American sports feed with image tags (media:content)
+    newsvisual: { url: "https://www.theguardian.com/us/sport/rss", max: 8, interval: 15, title: "Guardian US Sport" },
+    ticker: { url: "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml", max: 15, speed: 60 },
+    stocks: { symbols: "AAPL,MSFT,SPY" },
+    todo: { list: "default", title: "To-Do" },
+    photos: { interval: 15 },
+    countdown: { title: "Vacation!", target: "2026-07-01" },
+    embed: { url: "https://example.com" },
+    // The jukebox widget is optional; omit the default playlist to avoid rendering a blank black box.
+    // Users can add a jukebox widget manually with a valid playlist via the Admin UI.
+    jukebox: {},
+    standup: { zip: "10001", unit: "F" },
+    weathercloud: { device: "6041553454" },
+    sports: { league: "mlb", team: "Braves", max: 6 },
+    recipe: { diet: "carnivore" },
+    gphotos: { album: "https://photos.app.goo.gl/PASTE-SHARE-LINK", interval: 15, max: 50 },
+    camera: { hls: "http://SERVER:8888/camname/index.m3u8", refresh: 10 },
+    spotify_iframe: {},
+    lakelevel: { site: "04294500", flood: 100, title: "Lake Champlain" },
+    docs: { files: ["schedule.pdf"], interval: 30 },
+    // Birthday widget default configuration – includes a title and a sample list of people
+    birthdays: { 
+      title: "Upcoming Birthdays",
+      people: [
+        { name: "Alice", date: "1990-09-15" },
+        { name: "Bob", date: "04-22" }
+      ]
+    },
+    askhouse: {},
+    joke: {},
+    coindice: {},
+    packages: { title: "Packages" },
+    movies: { kind: "theater" },
+    streamnow: {},
+    duolingo: { users: "username1,username2" },
+    youtube: { mode: "latest", channelId: "", playlistId: "", max: 10, autoplay: false }
+  }[t] || {};
+}
+
+function widgetCard(type, config) {
+  return `<b>${type}</b><br>
+    <textarea class="wcfg" data-type="${type}" rows="3" style="width:95%">${JSON.stringify(config || defaults(type))}</textarea>
+    <button onclick="gs.removeWidget(this.closest('.grid-stack-item'))">X</button>`;
+}
+
+async function init() {
+  const me = await api("/api/me");
+  document.getElementById("whoami").textContent = `${me.name} (${me.household})`;
+  document.getElementById("paircode").textContent = me.pair_code;
+  if (me.role === "serveradmin") document.getElementById("saTools").classList.remove("hidden");
+  gs = GridStack.init({ column: 12, cellHeight: 70, margin: 6, float: true }, "#gs");
+  gs.on("change added removed", () => {
+    if (!pageLoading && layoutObj) dirtyPages.add(layoutObj.pages[pageIdx].id);
+  });
+  document.getElementById("pageSecs").addEventListener("input", () => {
+    if (layoutObj) dirtyPages.add(layoutObj.pages[pageIdx].id);
+  });
+  dashes = await api("/api/dashboards");
+  const sel = document.getElementById("dashSel");
+  sel.innerHTML = dashes.map(d => `<option value="${d.id}">${d.name}</option>`).join("");
+  loadDash(); loadMembers(); loadChores(); loadDevices(); loadApprovals(); loadInvites(); loadDocs(); loadPackages();
+  setInterval(loadApprovals, 60e3);
+}
+
+function loadDash() {
+  currentId = +document.getElementById("dashSel").value;
+  const d = dashes.find(x => x.id === currentId);
+  if (!d) return;
+  document.getElementById("theme").value = d.theme;
+  layoutObj = normalizeLayout(d.layout);
+  pageIdx = 0;
+  dirtyPages.clear();
+  renderPageTabs();
+  loadPage();
+}
+
+function loadPage() {
+  pageLoading = true;
+  gs.removeAll();
+  const p = layoutObj.pages[pageIdx];
+  document.getElementById("pageSecs").value = p.secs || 0;
+  p.widgets.forEach(w => gs.addWidget({ x: w.x, y: w.y, w: w.w, h: w.h, content: widgetCard(w.type, w.config) }));
+  pageLoading = false;
+}
+
+function captureCurrentPage() {
+  const widgets = [];
+  let badJson = null;
+  gs.engine.nodes.forEach(n => {
+    const ta = n.el && n.el.querySelector(".wcfg");
+    if (!ta) return;
+    let config = {};
+    try { config = JSON.parse(ta.value || "{}"); }
+    catch (e) { badJson = ta.dataset.type; }
+    widgets.push({ type: ta.dataset.type, x: n.x, y: n.y, w: n.w, h: n.h, config });
+  });
+  layoutObj.pages[pageIdx].widgets = widgets;
+  layoutObj.pages[pageIdx].secs = Math.max(0, +document.getElementById("pageSecs").value || 0);
+  return badJson;
+}
+
+function renderPageTabs() {
+  document.getElementById("pageTabs").innerHTML = layoutObj.pages.map((p, i) =>
+    `<button class="${i === pageIdx ? "pg-on" : ""}" onclick="switchPage(${i})">${p.name || ("Page " + (i + 1))}</button>`).join("");
+}
+
+function switchPage(i) {
+  captureCurrentPage();
+  pageIdx = i;
+  renderPageTabs();
+  loadPage();
+}
+
+function addPage() {
+  captureCurrentPage();
+  const id = "pg" + Date.now();
+  layoutObj.pages.push({ id, name: "Page " + (layoutObj.pages.length + 1), secs: 30, widgets: [] });
+  dirtyPages.add(id);
+  pageIdx = layoutObj.pages.length - 1;
+  renderPageTabs();
+  loadPage();
+}
+
+function delPage() {
+  if (layoutObj.pages.length <= 1) return alert("A dashboard needs at least one page.");
+  if (!confirm("Delete this page and its widgets?")) return;
+  layoutObj.pages.splice(pageIdx, 1);
+  pageIdx = Math.max(0, pageIdx - 1);
+  renderPageTabs();
+  loadPage();
+}
+
+function addWidget() {
+  gs.addWidget({ w: 3, h: 2, content: widgetCard(document.getElementById("wtype").value) });
+}
+
+async function save() {
+  const bad = captureCurrentPage();
+  if (bad) return alert(`Invalid JSON in the "${bad}" widget config - fix it and save again.`);
+  const d = dashes.find(x => x.id === currentId);
+  if (!d) return alert("No dashboard selected.");
+  dirtyPages.add(layoutObj.pages[pageIdx].id);
+  const fresh = await api("/api/dashboards");
+  const srv = fresh.find(x => x.id === currentId);
+  if (srv) {
+    const srvLayout = normalizeLayout(srv.layout);
+    layoutObj.pages.forEach(p => {
+      if (!dirtyPages.has(p.id)) {
+        const s = srvLayout.pages.find(x => x.id === p.id);
+        if (s) { p.widgets = s.widgets; p.secs = s.secs; p.name = s.name; }
+      }
+    });
+  }
+  const r = await api(`/api/dashboards/${currentId}`, "PUT",
+    { name: d.name, theme: document.getElementById("theme").value, layout: layoutObj });
+  if (r.ok) {
+    d.layout = layoutObj;
+    d.theme = document.getElementById("theme").value;
+    dirtyPages.clear();
+    loadPage();
+    alert("Saved - displays updated live.");
+  } else alert("Save failed: " + JSON.stringify(r));
+}
+
+async function newDash() {
+  const name = prompt("Dashboard name?"); if (!name) return;
+  await api("/api/dashboards", "POST", { name });
+  dashes = await api("/api/dashboards");
+  const sel = document.getElementById("dashSel");
+  sel.innerHTML = dashes.map(d => `<option value="${d.id}">${d.name}</option>`).join("");
+  sel.value = dashes[dashes.length - 1].id;
+  loadDash();
+}
+
+async function loadMembers() {
+  membersCache = await api("/api/members");
+  document.getElementById("members").innerHTML = membersCache.map(m => `
+    <div>${m.avatar} <b style="color:${m.color}">${m.name}</b> (${m.role}) &#11088;${m.points || 0} &#128241;${m.screen_minutes || 0}min
+      <button onclick="api('/api/members/${m.id}','DELETE').then(loadMembers)">X</button></div>`).join("");
+  document.getElementById("cMember").innerHTML =
+    `<option value="">-- assign to --</option>` +
+    membersCache.map(m => `<option value="${m.id}">${m.name}</option>`).join("");
+}
+
+async function addMember() {
+  await api("/api/members", "POST", {
+    name: document.getElementById("mName").value,
+    avatar: document.getElementById("mAvatar").value,
+    color: document.getElementById("mColor").value,
+    role: document.getElementById("mRole").value,
+    pin: document.getElementById("mPin").value,
+    points: 0,
+    screen_minutes: 0 });
+  loadMembers();
+}
+
+async function loadChores() {
+  const chores = await api("/api/chores");
+  const name = id => (membersCache.find(m => m.id === id) || {}).name || "unassigned";
+  document.getElementById("chores").innerHTML = chores.map(c => `
+    <div>${c.is_bounty ? "&#128176;" : "&#129529;"} <b>${c.title}</b> - ${name(c.member_id)},
+      ${c.points} pts, ${c.schedule}${c.rotate ? ", rotates" : ""} [${c.status}]
+      <button onclick="api('/api/chores/${c.id}','DELETE').then(loadChores)">X</button></div>`).join("");
+}
+
+async function addChore() {
+  await api("/api/chores", "POST", {
+    title: document.getElementById("cTitle").value,
+    member_id: +document.getElementById("cMember").value || null,
+    points: +document.getElementById("cPts").value,
+    screen_minutes: +document.getElementById("cMin").value,
+    schedule: document.getElementById("cSched").value,
+    rotate: document.getElementById("cRotate").checked ? 1 : 0,
+    is_bounty: document.getElementById("cBounty").checked ? 1 : 0,
+    status: "open" });
+  loadChores();
+}
+
+async function loadApprovals() {
+  const pending = await api("/api/approvals");
+  const name = id => (membersCache.find(m => m.id === id) || {}).name || "?";
+  document.getElementById("approvals").innerHTML = pending.map(c => `
+    <div>&#9203; <b>${name(c.claimed_by)}</b> did "<i>${c.title}</i>" (+${c.points} pts)
+      <button onclick="api('/api/approvals/${c.id}','POST',{approve:true}).then(()=>{loadApprovals();loadMembers();loadChores()})">Approve</button>
+      <button onclick="api('/api/approvals/${c.id}','POST',{approve:false}).then(()=>{loadApprovals();loadChores()})">Reject</button>
+    </div>`).join("") || "<i>Nothing waiting.</i>";
+}
+
+async function loadDevices() {
+  const devs = await api("/api/devices");
+  document.getElementById("devices").innerHTML = devs.map(d => `
+    <div><input value="${d.name}" id="dn-${d.id}"> <code>${d.id}</code>
+      <select id="dd-${d.id}">${dashes.map(x =>
+        `<option value="${x.id}" ${x.id === d.dashboard_id ? "selected" : ""}>${x.name}</option>`).join("")}</select>
+      <button onclick="saveDevice('${d.id}')">Assign</button>
+      <button onclick="if(confirm('Remove this display?'))api('/api/devices/${d.id}','DELETE').then(loadDevices)" style="background:#b23b3b">Remove</button>
+      <small>seen ${d.last_seen ? new Date(d.last_seen).toLocaleString() : "never"}</small></div>`).join("")
+    || "<i>No displays yet. Open /display.html on a screen and enter your pair code.</i>";
+}
+
+async function saveDevice(id) {
+  await api(`/api/devices/${id}`, "PUT", {
+    name: document.getElementById(`dn-${id}`).value,
+    dashboard_id: +document.getElementById(`dd-${id}`).value });
+  loadDevices();
+}
+
+async function invite(newHousehold) {
+  const r = newHousehold
+    ? await api("/api/admin/invites", "POST", {})
+    : await api("/api/invites", "POST", {});
+  document.getElementById("inviteOut").innerHTML =
+    `Invite code: <b style="font-size:1.3rem;color:#e8760e">${r.code}</b>
+     ${newHousehold ? "(creates a NEW household)" : "(joins YOUR household)"}
+     - they sign up at this site's /login.html`;
+  loadInvites();
+}
+
+async function loadInvites() {
+  const inv = await api("/api/invites");
+  document.getElementById("inviteList").innerHTML = inv.map(i => `
+    <div><code>${i.code}</code> ${i.household_id ? "(joins household)" : "(NEW household)"}
+      <button onclick="api('/api/invites/${i.code}','DELETE').then(loadInvites)" style="background:#b23b3b">Revoke</button>
+    </div>`).join("") || "<i>No open invites.</i>";
+}
+
+async function uploadPhotos() {
+  const fd = new FormData();
+  for (const f of document.getElementById("photoFiles").files) fd.append("photos", f);
+  const r = await fetch("/api/photos", { method: "POST", body: fd });
+  if (r.status === 401) location.href = "/login.html";
+  alert("Uploaded.");
+}
+
+async function uploadDocs() {
+  const fd = new FormData();
+  for (const f of document.getElementById("docFiles").files) fd.append("docs", f);
+  const r = await fetch("/api/docs", { method: "POST", body: fd });
+  if (r.status === 401) location.href = "/login.html";
+  loadDocs();
+  alert("Uploaded. Reference the filename in a docs widget config.");
+}
+
+async function loadDocs() {
+  const docs = await api("/api/docs");
+  document.getElementById("docList").innerHTML = docs.map(f => `
+    <div><code>${f}</code>
+      <button onclick="api('/api/docs/${encodeURIComponent(f)}','DELETE').then(loadDocs)" style="background:#b23b3b">Delete</button>
+    </div>`).join("") || "<i>No documents uploaded.</i>";
+}
+
+async function addPackage() {
+  const label = document.getElementById("pkgLabel").value.trim();
+  const num = document.getElementById("pkgNum").value.trim();
+  if (!num) return;
+  await api("/api/todos", "POST", { list_name: "packages", text: `${label || "Package"} | ${num}`, done: 0 });
+  document.getElementById("pkgLabel").value = "";
+  document.getElementById("pkgNum").value = "";
+  loadPackages();
+}
+
+async function loadPackages() {
+  const all = await api("/api/todos");
+  const pkgs = all.filter(t => t.list_name === "packages");
+  document.getElementById("pkgList").innerHTML = pkgs.map(t => `
+    <div>${t.done ? "&#9989;" : "&#128230;"} ${t.text}
+      <button onclick="api('/api/todos/${t.id}','PUT',{done:${t.done ? 0 : 1}}).then(loadPackages)">${t.done ? "Undo" : "Delivered"}</button>
+      <button onclick="api('/api/todos/${t.id}','DELETE').then(loadPackages)" style="background:#b23b3b">X</button>
+    </div>`).join("") || "<i>No packages tracked.</i>";
+}
+
+// ----- Backup / Restore UI Helpers -----
+/**
+ * Load the list of backup folders from the server and populate the <select> element.
+ */
+async function loadBackupList() {
+  try {
+    const list = await api("/api/backups");
+    const sel = document.getElementById("restoreSelect");
+    sel.innerHTML = list.map(name => `<option value="${name}">${name}</option>`).join("");
+  } catch (e) {
+    console.error("Failed to load backups", e);
+    // optional: show an alert
+    alert("Unable to load backup list: " + (e?.error || e.message || e));
+  }
+}
+
+/**
+ * Trigger a server‑side backup of the current installation.
+ */
+async function doBackup() {
+  try {
+    const res = await api("/api/backup", "POST");
+    if (res.error) throw new Error(res.error);
+    alert(`Backup created: ${res.folder}`);
+    // Refresh the list so the new backup appears in the dropdown.
+    await loadBackupList();
+  } catch (e) {
+    console.error("Backup failed", e);
+    alert("Backup failed: " + (e?.error || e.message || e));
+  }
+}
+
+/**
+ * Restore from the selected backup folder.
+ */
+async function doRestore() {
+  const sel = document.getElementById("restoreSelect");
+  const folder = sel.value;
+  if (!folder) {
+    alert("Please select a backup to restore.");
+    return;
+  }
+  if (!confirm(`Restore from backup "${folder}"? This will overwrite the current installation and restart the service.`)) {
+    return;
+  }
+  try {
+    const res = await api("/api/restore", "POST", { folder });
+    if (res.error) throw new Error(res.error);
+    alert("Restore initiated. The service will restart shortly. Please refresh the page after a few seconds.");
+    // Optionally reload the page after a delay to reflect restored state.
+    setTimeout(() => location.reload(), 8000);
+  } catch (e) {
+    console.error("Restore failed", e);
+    alert("Restore failed: " + (e?.error || e.message || e));
+  }
+}
+
+init();
+// Populate the backup dropdown once the admin UI loads.
+loadBackupList();

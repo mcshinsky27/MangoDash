@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MangoDash Display</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gridstack@10/dist/gridstack.min.css">
+<link rel="stylesheet" href="/css/dash.css">
+</head><body class="display-body theme-dark">
+<div id="pairing" class="pairing hidden">
+  <h1>&#129389; MangoDash</h1>
+  <p>Enter your household pair code<br>(shown in the Admin panel):</p>
+  <input id="paircode" maxlength="6" style="font-size:2rem;text-align:center;width:220px;text-transform:uppercase">
+  <button onclick="submitPair()" style="font-size:1.3rem;padding:10px 30px">Pair Display</button>
+  <p>Device ID: <b id="devid"></b></p>
+</div>
+<div id="pageDots" class="page-dots"></div>
+<div id="grid" class="dash-grid"></div>
+<!-- Refresh Cache button for troubleshooting (clears server widget cache) -->
+<button id="refreshCacheBtn" onclick="refreshCache()" style="position:fixed;top:10px;right:10px;z-index:1000;">Refresh Cache</button>
+<script>
+  function refreshCache(){
+    fetch('/api/clear-cache', {method:'POST'}).then(()=>location.reload());
+  }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/gridstack@10/dist/gridstack-all.js"></script>
+<script src="/js/apps.js"></script>
+<script src="/js/games/solitaire.js"></script>
+<script src="/js/games/minesweeper.js"></script>
+<script src="/js/display.js"></script>
+</body></html>

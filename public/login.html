@@ -1,0 +1,40 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MangoDash Login</title><link rel="stylesheet" href="/css/dash.css">
+<link rel="manifest" href="/manifest.json"></head>
+<body class="admin-body" style="max-width:400px;margin:60px auto">
+<h1>🥭 MangoDash</h1>
+<div id="loginBox">
+  <input id="email" placeholder="Email" style="width:100%;margin:4px 0">
+  <input id="pass" type="password" placeholder="Password" style="width:100%;margin:4px 0">
+  <button onclick="doLogin()" style="width:100%">Log In</button>
+  <p><a href="#" onclick="toggle()" style="color:#e8760e">Have an invite code? Sign up</a></p>
+</div>
+<div id="signupBox" class="hidden">
+  <input id="sName" placeholder="Your name" style="width:100%;margin:4px 0">
+  <input id="sEmail" placeholder="Email" style="width:100%;margin:4px 0">
+  <input id="sPass" type="password" placeholder="Password (8+ chars)" style="width:100%;margin:4px 0">
+  <input id="sInvite" placeholder="Invite code" style="width:100%;margin:4px 0">
+  <button onclick="doSignup()" style="width:100%">Create Account</button>
+  <p><a href="#" onclick="toggle()" style="color:#e8760e">Back to login</a></p>
+</div>
+<p id="msg" style="color:#ef5350"></p>
+<script>
+const $ = id => document.getElementById(id);
+function toggle(){ $("loginBox").classList.toggle("hidden"); $("signupBox").classList.toggle("hidden"); }
+async function doLogin(){
+  const r = await fetch("/api/login",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({email:$("email").value,password:$("pass").value})});
+  const d = await r.json();
+  if(r.ok) location.href = "/admin.html"; else $("msg").textContent = d.error;
+}
+async function doSignup(){
+  const r = await fetch("/api/signup",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({name:$("sName").value,email:$("sEmail").value,
+      password:$("sPass").value,invite:$("sInvite").value})});
+  const d = await r.json();
+  if(r.ok){ $("msg").style.color="#4caf50"; $("msg").textContent="Account created — log in!"; toggle(); }
+  else $("msg").textContent = d.error;
+}
+$("pass").addEventListener("keydown", e => { if(e.key==="Enter") doLogin(); });
+</script></body></html>

@@ -1,0 +1,109 @@
+{
+  "top_music_playlists_cache": {
+    "data": [
+      {
+        "id": "PL4fGSI1pDJn4yCNzulPkUbxgr4pl0gmI-",
+        "title": "Top 100 Live Performances - United States",
+        "description": "This week's ranking of the most popular live music performances on YouTube.",
+        "thumbnail": "https://i.ytimg.com/vi/1a3REFH83WA/hqdefault.jpg",
+        "trackCount": 99,
+        "trending": true,
+        "source": "youtube_charts_dynamic"
+      },
+      {
+        "id": "PL4fGSI1pDJn6O1LS0XSdF3RyO0Rq_LDeI",
+        "title": "Top 100 Songs United States",
+        "description": "Top popular songs in the US.",
+        "thumbnail": null,
+        "trackCount": 100,
+        "trending": true,
+        "source": "fallback"
+      },
+      {
+        "id": "PL4fGSI1pDJn61unMfmrUSz68RT8IFFnks",
+        "title": "Daily Top Music Videos - United States",
+        "description": "Daily top videos in the US.",
+        "thumbnail": null,
+        "trackCount": 100,
+        "trending": true,
+        "source": "fallback"
+      },
+      {
+        "id": "PL4fGSI1pDJn69On1f-8NAvX_CYlx7QyZc",
+        "title": "Top 100 Music Videos United States",
+        "description": "Weekly top videos in the US.",
+        "thumbnail": null,
+        "trackCount": 100,
+        "trending": true,
+        "source": "fallback"
+      },
+      {
+        "id": "PL4fGSI1pDJn77aK7sAW2AT0oOzo5inWY8",
+        "title": "Top 50 Pop Music Videos United States",
+        "description": "Top Pop music videos in the US.",
+        "thumbnail": null,
+        "trackCount": 50,
+        "trending": true,
+        "source": "fallback"
+      },
+      {
+        "id": "PL4fGSI1pDJn4fmCoF1vKHLtivI0f9yHiF",
+        "title": "Top 50 Hip Hop Music Videos United States",
+        "description": "Top Hip Hop music videos in the US.",
+        "thumbnail": null,
+        "trackCount": 50,
+        "trending": true,
+        "source": "fallback"
+      },
+      {
+        "id": "PL4fGSI1pDJn4EBsWVeFpcSAVOFMfhyipg",
+        "title": "Top 50 Country & Americana Music Videos",
+        "description": "Top Country & Americana music videos in the US.",
+        "thumbnail": null,
+        "trackCount": 50,
+        "trending": true,
+        "source": "fallback"
+      },
+      {
+        "id": "PL4fGSI1pDJn5LOptOQixqnzXNGjNXAgYY",
+        "title": "Top 50 Rock Music Videos United States",
+        "description": "Top Rock music videos in the US.",
+        "thumbnail": null,
+        "trackCount": 50,
+        "trending": true,
+        "source": "fallback"
+      },
+      {
+        "id": "PL4fGSI1pDJn4rBU0RHnR6-b1_uE20CzRH",
+        "title": "Top 50 Dance & Electronic Music Videos",
+        "description": "Top Dance music videos in the US.",
+        "thumbnail": null,
+        "trackCount": 50,
+        "trending": true,
+        "source": "fallback"
+      },
+      {
+        "id": "PL4fGSI1pDJn4w4wTTgOmP_S80PoCtbGrL",
+        "title": "Top 50 Hard Rock & Metal Music Videos",
+        "description": "Top Metal music videos in the US.",
+        "thumbnail": null,
+        "trackCount": 50,
+        "trending": true,
+        "source": "fallback"
+      }
+    ],
+    "timestamp": 1791544812071,
+    "playlistIds": [
+      "PL4fGSI1pDJn4yCNzulPkUbxgr4pl0gmI-",
+      "PL4fGSI1pDJn6O1LS0XSdF3RyO0Rq_LDeI",
+      "PL4fGSI1pDJn61unMfmrUSz68RT8IFFnks",
+      "PL4fGSI1pDJn69On1f-8NAvX_CYlx7QyZc",
+      "PL4fGSI1pDJn77aK7sAW2AT0oOzo5inWY8",
+      "PL4fGSI1pDJn4fmCoF1vKHLtivI0f9yHiF",
+      "PL4fGSI1pDJn4EBsWVeFpcSAVOFMfhyipg",
+      "PL4fGSI1pDJn5LOptOQixqnzXNGjNXAgYY",
+      "PL4fGSI1pDJn4rBU0RHnR6-b1_uE20CzRH",
+      "PL4fGSI1pDJn4w4wTTgOmP_S80PoCtbGrL"
+    ]
+  }
+}

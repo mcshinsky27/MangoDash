@@ -1,0 +1,93 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MangoDash Connections</title>
+<link rel="stylesheet" href="/css/dash.css">
+<link rel="manifest" href="/manifest.json">
+<style>
+  body { background:#0d1117; color:#e6edf3; font-family:'Segoe UI',system-ui,sans-serif; margin:0; padding:32px; }
+  .portal { max-width:980px; margin:0 auto; }
+  h1 { display:flex; align-items:center; gap:12px; font-size:1.7rem; }
+  h1 small { opacity:.55; font-weight:400; font-size:.95rem; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-top:24px; }
+  .app-card { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:20px;
+    display:flex; flex-direction:column; gap:10px; transition:transform .15s, box-shadow .15s; }
+  .app-card:hover { transform:translateY(-3px); box-shadow:0 6px 20px rgba(0,0,0,.35); }
+  .app-head { display:flex; align-items:center; gap:12px; }
+  .app-ico { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+    font-size:1.5rem; color:#fff; background:linear-gradient(135deg,var(--brand,#e8760e),rgba(0,0,0,.35)); }
+  .app-name { font-weight:600; font-size:1.05rem; }
+  .app-desc { opacity:.65; font-size:.85rem; }
+  .status { font-size:.8rem; padding:4px 10px; border-radius:20px; align-self:flex-start; }
+  .status.ok { background:rgba(34,197,94,.15); color:#4ade80; }
+  .status.no { background:rgba(234,67,53,.15); color:#f87171; }
+  .status.warn { background:rgba(245,158,11,.15); color:#fbbf24; }
+  .actions { display:flex; gap:8px; margin-top:4px; flex-wrap:wrap; }
+  button { cursor:pointer; border:0; border-radius:8px; padding:9px 16px; font-weight:600; background:#e8760e; color:#fff;
+    transition:filter .12s, transform .08s; }
+  button:hover { filter:brightness(1.12); }
+  button:active { transform:scale(.97); }
+  button.ghost { background:rgba(255,255,255,.08); }
+  button.danger { background:#b23b3b; }
+  a.openlink { color:#7ab8ff; font-size:.85rem; align-self:center; text-decoration:none; }
+  a.openlink:hover { text-decoration:underline; }
+  .note { margin-top:24px; padding:14px 18px; border-radius:12px; background:rgba(61,155,233,.1);
+    border:1px solid rgba(61,155,233,.25); font-size:.88rem; opacity:.85; line-height:1.5; }
+  .auth-note { font-size:.78rem; opacity:.5; }
+</style></head>
+<body>
+<div class="portal">
+  <h1>&#127891; MangoDash Connections <small>sign in once, power every widget</small></h1>
+  <div class="cards" id="cards"></div>
+  <div class="note">
+    &#128161; <b>Google Calendar:</b> add your school calendar to the Calendar widget using its
+    <i>secret iCal address</i> (Google Calendar &#8594; Settings &#8594; Integrate calendar) &#8212; no OAuth needed.<br>
+    <b>Alma / ParentSquare:</b> these feed from your school's digest emails once Gmail is connected.
+    Sender patterns can be tuned with ALMA_SENDER_PATTERNS / PARENTSQUARE_SENDER_PATTERNS in .env.
+  </div>
+</div>
+<script src="/js/apps.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+async function api(u, m = "GET", b) {
+  const r = await fetch(u, { method: m, headers: { "Content-Type": "application/json" },
+    body: b ? JSON.stringify(b) : undefined });
+  if (r.status === 401) { location.href = "/login.html"; throw new Error("401"); }
+  return r.json();
+}
+function statusHtml(app, st) {
+  if (app.auth === "none") return `<span class="status ok">Always available</span>`;
+  if (st.google && st.google.connected) return `<span class="status ok">Connected${st.google.email ? " &#8211; " + st.google.email : ""}</span>`;
+  if (st.google && st.google.expired) return `<span class="status warn">Session expired &#8211; reconnect</span>`;
+  if (!st.googleConfigured) return `<span class="status warn">Add GOOGLE_CLIENT_ID/SECRET to .env</span>`;
+  return `<span class="status no">Not connected</span>`;
+}
+async function load() {
+  let st = {};
+  try { st = await api("/api/connections"); } catch (e) { return; }
+  $("cards").innerHTML = window.MangoApps.map(app => `
+    <div class="app-card" style="--brand:${app.brand}">
+      <div class="app-head">
+        <div class="app-ico">${app.icon}</div>
+        <div><div class="app-name">${app.name}</div><div class="app-desc">${app.desc}</div></div>
+      </div>
+      ${statusHtml(app, st)}
+      <div class="actions">
+        ${app.auth === "google"
+          ? (st.google && st.google.connected
+              ? `<button class="ghost" onclick="location.href='${st.google.loginUrl}'">Reconnect</button>
+                 <button class="danger" onclick="disconnect('${app.id}')">Disconnect</button>`
+              : `<button onclick="location.href='${(st.google && st.google.loginUrl) || "/api/google/login"}'">Connect Google</button>`)
+          : ""}
+        ${app.game ? `<button class="ghost" onclick="alert('Play from the Solitaire / Minesweeper widgets on your dashboard!')">Play on dashboard</button>` : ""}
+        ${app.link ? `<a class="openlink" href="${app.link}" target="_blank" rel="noopener">Open ${app.name} &#8599;</a>` : ""}
+      </div>
+      ${app.auth === "email-digest" && st.google && !st.google.connected ? `<span class="auth-note">Requires the Google connection above</span>` : ""}
+    </div>`).join("");
+}
+async function disconnect() {
+  if (!confirm("Disconnect Google? All Google-powered education widgets will stop updating.")) return;
+  await api("/api/connections/google/disconnect", "POST");
+  load();
+}
+load();
+</script></body></html>

@@ -1,0 +1,46 @@
+﻿# Dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Database files
+data/*.db
+data/*.sqlite
+
+# Backup folders - exclude all backup snapshots
+Backup/
+
+# Backup files
+*.bak
+*.bak.*
+*.backup*
+.pre-*
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Build outputs
+dist/
+build/
+
+# Cline memory bank (optional - remove if you want to track it)
+memory-bank/
+.kilo/

@@ -1,0 +1,9 @@
+{
+  "name": "MangoDash",
+  "short_name": "MangoDash",
+  "start_url": "/admin.html",
+  "display": "standalone",
+  "background_color": "#0e1117",
+  "theme_color": "#e8760e",
+  "icons": []
+}
