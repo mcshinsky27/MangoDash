@@ -743,6 +743,14 @@ mech.innerHTML = `
   </div>`;
 rack.appendChild(mech);
 
+// Skip button overlay (fixed position, visible during Free Play)
+const skipBtnEl = document.createElement("button");
+skipBtnEl.id = "skip-btn";
+skipBtnEl.className = "skip-btn";
+skipBtnEl.style.display = "none";
+skipBtnEl.textContent = "SKIP SONG";
+document.body.appendChild(skipBtnEl);
+
 // YouTube CRT screen (appended to body to bypass 3D perspective rotation and allow fullscreen display)
 const videoScreen = document.createElement("div");
 videoScreen.className = "video-screen";
