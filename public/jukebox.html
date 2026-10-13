@@ -165,6 +165,46 @@ html, body { width: 100%; height: 100%; overflow: hidden;
     inset 0 2px 2px rgba(255,255,255,0.9), inset 0 -3px 4px rgba(184,134,11,0.8); }
 }
 
+/* ============ Skip Button ============ */
+.skip-btn {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 10px 20px;
+  background: linear-gradient(90deg, #b8860b 0%, #ffd700 50%, #b8860b 100%);
+  border: 2px solid #8b7355;
+  border-radius: 6px;
+  color: #211703;
+  font-family: "Courier New", monospace;
+  font-weight: bold;
+  font-size: 11px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.6), inset 0 1px 3px rgba(255,255,255,0.4);
+  z-index: 10;
+  transition: all 0.2s ease;
+}
+.skip-btn:hover {
+  filter: brightness(1.2);
+  transform: translate(-50%, -50%) scale(1.05);
+}
+.skip-btn.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: skipPulse 1s ease-in-out infinite;
+}
+.skip-btn.gap-mode {
+  background: linear-gradient(90deg, #228b22 0%, #32cd32 50%, #228b22 100%);
+  border-color: #006400;
+}
+@keyframes skipPulse {
+  0%, 100% { opacity: 1; box-shadow: 0 3px 6px rgba(0,0,0,0.6), 0 0 10px rgba(255,215,0,0.3); }
+  50% { opacity: 0.8; box-shadow: 0 3px 6px rgba(0,0,0,0.6), 0 0 20px rgba(255,215,0,0.6); }
+}
+
 /* ============ Coin Slot ============ */
 .coin-slot {
   display: flex;
@@ -697,7 +737,10 @@ rack.appendChild(endRail);
 // Center mechanism window
 const mech = document.createElement("div"); mech.className = "mech"; mech.id = "mech";
 mech.innerHTML = `
-  <div class="win" id="classic-win"><div class="disc"></div></div>`;
+  <div class="win" id="classic-win">
+    <div class="disc"></div>
+    <button class="skip-btn" id="skip-btn" style="display:none">SKIP SONG</button>
+  </div>`;
 rack.appendChild(mech);
 
 // YouTube CRT screen (appended to body to bypass 3D perspective rotation and allow fullscreen display)
@@ -829,6 +872,21 @@ function select(L, D) {
   const r = Math.floor((dnum - 1) / 2), side = (dnum % 2 === 1) ? 0 : 1;
   const row = rowBlock * 5 + r;
   const track = trackFor(col, row, side);
+  const row = rowBlock * 5 + r;
+  const track = trackFor(col, row, side);
+  
+  // FIX: Check if we're in Free Play gap mode - skip instead of select
+  if (freePlayActive && freePlayTimer) {
+    clickSound();
+    clearTimeout(freePlayTimer);
+    freePlayTimer = null;
+    hideSkipButton();
+    setProg("SKIP! • NEXT SONG");
+    playNextFreePlayTrack();
+    return;
+  }
+  
+  if (!track) { setProg(L + D + "  — EMPTY SLOT"); return; }
   if (!track) { setProg(L + D + "  \u2014 EMPTY SLOT"); return; }
   
   // Unpaired device with Spotify tracks - not allowed
@@ -921,8 +979,13 @@ function ensureYtPlayer() {
             if (freePlayActive) {
               setProg("FREE PLAY • NEXT SONG IN 15s");
               freePlayTimer = setTimeout(() => {
-                if (freePlayActive) playNextFreePlayTrack();
+                if (freePlayActive) {
+                  freePlayTimer = null;
+                  playNextFreePlayTrack();
+                }
               }, FREEPLAY_GAP_MS);
+              // Update skip button to show countdown
+              updateSkipButtonState();
             }
           }
           // Report play state to the parent dashboard so page rotation holds.
@@ -1046,6 +1109,8 @@ function mechanicalSequence(done) {
 let freePlayActive = false;
 let freePlayQueue = [];
 let freePlayTimer = null;
+let skipBtn = null; // Skip button element reference
+let countdownInterval = null; // Countdown timer interval
 const FREEPLAY_GAP_MS = 15000; // 15 seconds between songs
 
 function toggleFreePlay() {
@@ -1068,6 +1133,15 @@ function startFreePlay() {
   freePlayBtn.classList.add("active");
   freePlayBtn.textContent = "STOP";
   
+  // Initialize skip button
+  skipBtn = document.getElementById('skip-btn');
+  if (skipBtn) {
+    skipBtn.addEventListener('click', handleSkipClick);
+  }
+  
+  // Show skip button immediately
+  updateSkipButtonState();
+  
   // Play first song immediately
   playNextFreePlayTrack();
 }
@@ -1075,13 +1149,114 @@ function startFreePlay() {
 function stopFreePlay() {
   freePlayActive = false;
   freePlayQueue = [];
+  
+  // Clear timers
   if (freePlayTimer) {
     clearTimeout(freePlayTimer);
     freePlayTimer = null;
   }
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+    countdownInterval = null;
+  }
+  
+  // Hide skip button
+  hideSkipButton();
+  skipBtn = null;
+  
   freePlayBtn.classList.remove("active");
   freePlayBtn.textContent = "FREE PLAY";
   setProg("MAKE SELECTION");
+}
+
+// ---- Skip Button Handler ----
+function handleSkipClick() {
+  if (!freePlayActive || !skipBtn) return;
+  
+  // Play selection sound
+  clickSound();
+  
+  // Stop current song if playing
+  if (ytPlayer) {
+    const state = ytPlayer.getPlayerState ? ytPlayer.getPlayerState() : -1;
+    if (state === YT.PlayerState.PLAYING || state === YT.PlayerState.PAUSED) {
+      stopYt(false);
+    }
+  }
+  
+  // Clear gap timer if running
+  if (freePlayTimer) {
+    clearTimeout(freePlayTimer);
+    freePlayTimer = null;
+  }
+  
+  // Clear countdown interval
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+    countdownInterval = null;
+  }
+  
+  // Hide skip button
+  hideSkipButton();
+  
+  // Show skip feedback
+  setProg("SKIP! • NEXT SONG");
+  
+  // Play next song
+  playNextFreePlayTrack();
+}
+
+function updateSkipButtonState() {
+  if (!skipBtn || !freePlayActive) return;
+  
+  skipBtn.classList.add('active');
+  
+  if (freePlayTimer) {
+    // Gap mode - show countdown
+    skipBtn.classList.add('gap-mode');
+    skipBtn.textContent = 'SKIP • 15s';
+    startCountdown();
+  } else {
+    // Playback mode - show skip label
+    skipBtn.classList.remove('gap-mode');
+    skipBtn.textContent = 'SKIP SONG';
+    if (countdownInterval) {
+      clearInterval(countdownInterval);
+      countdownInterval = null;
+    }
+  }
+}
+
+function startCountdown() {
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+  }
+  
+  let countdown = 15;
+  skipBtn.textContent = `SKIP • ${countdown}s`;
+  
+  countdownInterval = setInterval(() => {
+    countdown--;
+    if (countdown <= 0) {
+      clearInterval(countdownInterval);
+      countdownInterval = null;
+      hideSkipButton();
+    } else {
+      skipBtn.textContent = `SKIP • ${countdown}s`;
+    }
+  }, 1000);
+}
+
+function hideSkipButton() {
+  if (!skipBtn) return;
+  skipBtn.classList.remove('active');
+  skipBtn.classList.remove('gap-mode');
+  skipBtn.style.display = 'none';
+  
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+    countdownInterval = null;
+  }
 }
 
 function playNextFreePlayTrack() {

@@ -54,6 +54,14 @@ const DEFAULT_SELECTED_PLAYLISTS = [
 3. Next random song auto-plays
 4. Stops on manual interaction
 
+**Skip Controls**:
+- **SKIP SONG button**: Appears during playback (golden button in center display)
+  - Click to immediately stop current song and play next
+- **SKIP button**: Appears during 15-second gap (green button with countdown)
+  - Click to skip countdown and play next song immediately
+- **Selection buttons**: Press any selection button (1A, 5B, etc.) during gap
+  - Skips countdown and plays next song
+
 **Controls**:
 - **STOP button**: Exit Free Play mode
 - **X button on video**: Stop immediately, reset button

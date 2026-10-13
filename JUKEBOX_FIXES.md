@@ -118,3 +118,56 @@ if (!track) {
 ---
 
 All fixes have been applied and verified. The jukebox code is now more robust and handles edge cases better.
+
+## NEW FEATURE: Context-Aware Skip Button
+
+**Date:** 10/12/2026
+
+**Overview:**
+Implemented a skip button that works during both active playback AND the 15-second gap between songs, with context-aware labeling and behavior.
+
+**Features:**
+
+### Skip During Playback
+- **Button appearance:** Golden "SKIP SONG" button in center display
+- **Behavior:** Click to immediately stop current song and play next
+- **Visual:** Pulsing golden gradient with shadow effects
+
+### Skip During Gap
+- **Button appearance:** Green "SKIP • 15s" button with countdown
+- **Behavior:** Click to skip countdown and play next song immediately
+- **Visual:** Green gradient with pulsing animation, countdown updates every second
+
+### Selection Button Skip
+- **Behavior:** Press any selection button (1A, 5B, etc.) during 15-second gap
+- **Result:** Skips countdown and plays next song immediately
+- **Feedback:** Shows "SKIP! • NEXT SONG" in marquee
+
+**User Experience Flow:**
+```
+Song Playing:     [SKIP SONG] button pulses in classic window
+                  ↓ (click)
+Next Song Starts immediately
+
+15-Second Gap:    [SKIP • 12s] button shows countdown
+                  ↓ (click)
+Next Song Starts immediately (skips remaining countdown)
+```
+
+**Updated Files:**
+- `C:\MangoDash\public\jukebox.html` - Skip button CSS, HTML, and JavaScript
+- `C:\MangoDash\JUKEBOX_GUIDE.md` - Updated with skip controls documentation
+
+---
+
+**Testing Checklist:**
+- [ ] Skip button appears when Free Play starts
+- [ ] Skip button shows "SKIP SONG" during playback
+- [ ] Skip button works during playback (stops current, plays next)
+- [ ] Skip button changes to green when song ends
+- [ ] Skip button shows countdown (15s, 14s, 13s...)
+- [ ] Skip button works during gap (skips countdown)
+- [ ] Selection buttons skip during gap
+- [ ] Selection buttons do NOT skip during playback (normal selection)
+- [ ] Countdown clears properly when song ends
+- [ ] Skip button hides when Free Play stops
