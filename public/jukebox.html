@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="utf-8">
+﻿<!DOCTYPE html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Wurlitzer Zodiac</title>
 <style>
@@ -875,8 +875,6 @@ function select(L, D) {
   const r = Math.floor((dnum - 1) / 2), side = (dnum % 2 === 1) ? 0 : 1;
   const row = rowBlock * 5 + r;
   const track = trackFor(col, row, side);
-  const row = rowBlock * 5 + r;
-  const track = trackFor(col, row, side);
   
   // FIX: Check if we're in Free Play gap mode - skip instead of select
   if (freePlayActive && freePlayTimer) {
@@ -1112,8 +1110,7 @@ function mechanicalSequence(done) {
 let freePlayActive = false;
 let freePlayQueue = [];
 let freePlayTimer = null;
-let skipBtn = null; // Skip button state reference
-let skipBtnEl = null; // Skip button DOM element
+let skipBtn = null; // Skip button reference
 let countdownInterval = null; // Countdown timer interval
 const FREEPLAY_GAP_MS = 15000; // 15 seconds between songs
 
