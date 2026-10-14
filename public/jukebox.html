@@ -460,9 +460,34 @@ html, body { width: 100%; height: 100%; overflow: hidden;
   to { transform: scale(1) translateY(0); opacity: 1; }
 }
 .playlist-header {
-  padding: 20px; border-bottom: 1px solid rgba(201, 162, 39, 0.3);
+  padding: 20px; border-bottom: 1px solid rgba(201, 162, 0.3);
   text-align: center; color: #c9a227; font-weight: bold;
   letter-spacing: 2px; font-size: 1.2rem;
+}
+.playlist-url-input-section {
+  padding: 15px 20px; border-bottom: 1px solid rgba(201, 162, 39, 0.2);
+  background: rgba(0,0,0,0.2); display: flex; gap: 10px; align-items: center;
+}
+.playlist-url-input {
+  flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(201, 162, 39, 0.3);
+  border-radius: 6px; padding: 10px 14px; color: #eee; font-size: 13px;
+  outline: none; transition: all 0.2s ease;
+}
+.playlist-url-input::placeholder { color: #666; }
+.playlist-url-input:focus {
+  border-color: #c9a227; box-shadow: 0 0 10px rgba(201, 162, 39, 0.3);
+  background: rgba(255,255,255,0.12);
+}
+.playlist-url-btn {
+  background: #c9a227; color: #1a1a2e; border: none; padding: 10px 18px;
+  border-radius: 6px; font-weight: bold; cursor: pointer;
+  transition: all 0.2s ease; text-transform: uppercase; white-space: nowrap;
+}
+.playlist-url-btn:hover { background: #ffcf64; transform: scale(1.05); }
+.playlist-url-btn:disabled { background: #555; color: #888; cursor: not-allowed; transform: none; }
+.playlist-url-info {
+  color: #888; font-size: 11px; padding: 0 20px 10px; text-align: center;
+  border-bottom: 1px solid rgba(201, 162, 39, 0.1);
 }
 .playlist-grid {
   padding: 20px; overflow-y: auto; display: grid;
@@ -546,6 +571,15 @@ html, body { width: 100%; height: 100%; overflow: hidden;
 <div id="playlistModal" class="playlist-modal">
   <div class="playlist-content">
     <div class="playlist-header">MUSIC FOR MILLIONS</div>
+    <div class="playlist-url-input-section">
+      <input 
+        type="text" 
+        id="playlistUrlInput" 
+        class="playlist-url-input" 
+        placeholder="Paste YouTube playlist URL (e. g. https://www.youtube.com/playlist?list=PL...)"
+      />
+      <button id="playlistUrlBtn" class="playlist-url-btn">ADD PLAYLIST</button>
+    </div>
     <div id="playlistGrid" class="playlist-grid">
       <!-- Playlists populated by JS -->
     </div>
@@ -1148,12 +1182,15 @@ function initPlaylistSelector() {
   const stats = document.getElementById("playlistStats");
   const loadBtn = document.getElementById("playlistLoadBtn");
   const mfm = document.querySelector(".mfm");
+  const urlInput = document.getElementById("playlistUrlInput");
+  const urlBtn = document.getElementById("playlistUrlBtn");
   
   if (!mfm) return;
   mfm.id = "seeburg";
   
   let selectedIds = new Set(DEFAULT_SELECTED_PLAYLISTS);
   let playlistMetadata = [];
+  let customPlaylists = [];  // Store user-added custom playlists
 
   const updateStats = () => {
     const totalTracks = playlistMetadata
@@ -1174,6 +1211,7 @@ function initPlaylistSelector() {
           <div class="playlist-title-wrapper">
             <div class="playlist-title">${p.title}</div>
             ${p.trending ? '<span class="playlist-badge">TRENDING</span>' : ''}
+            ${p.source === "custom" ? '<span class="playlist-badge">CUSTOM</span>' : ''}
           </div>
           <div class="playlist-meta">${p.trackCount || 0} tracks</div>
         </div>
@@ -1188,9 +1226,105 @@ function initPlaylistSelector() {
     });
   };
 
+  // Extract playlist ID from YouTube URL
+  const extractPlaylistId = (url) => {
+    try {
+      // Handle full URL: https://www.youtube.com/playlist?list=PL...
+      const urlParams = new URL(url);
+      if (urlParams.hostname.includes("youtube.com") || urlParams.hostname.includes("youtu.be")) {
+        const listId = urlParams.searchParams.get("list");
+        if (listId && (listId.startsWith("PL") || listId.startsWith("RD") || listId.startsWith("UL"))) {
+          return listId;
+        }
+      }
+      // Handle direct playlist ID
+      if (url.startsWith("PL") || url.startsWith("RD") || url.startsWith("UL")) {
+        return url;
+      }
+    } catch (e) {
+      // Invalid URL
+    }
+    return null;
+  };
+
+  // Handle URL input button click
+  urlBtn.onclick = async () => {
+    const url = urlInput.value.trim();
+    if (!url) {
+      alert("Please paste a YouTube playlist URL");
+      return;
+    }
+
+    const playlistId = extractPlaylistId(url);
+    if (!playlistId) {
+      alert("Invalid YouTube playlist URL. Please paste a valid URL like:\nhttps://www.youtube.com/playlist?list=PL...");
+      return;
+    }
+
+    // Check if already added
+    if (playlistMetadata.some(p => p.id === playlistId)) {
+      alert("This playlist is already in the list!");
+      urlInput.value = "";
+      return;
+    }
+
+    // Fetch metadata for the custom playlist
+    urlBtn.disabled = true;
+    urlBtn.textContent = "LOADING...";
+    
+    try {
+      const metaRes = await fetch(`/api/jukebox/playlists/metadata?ids=${playlistId}`);
+      const metaData = await metaRes.json();
+      const playlistData = metaData.playlists?.[0];
+      
+      if (!playlistData) {
+        alert("Failed to load playlist. Please check the URL and try again.");
+        urlBtn.disabled = false;
+        urlBtn.textContent = "ADD PLAYLIST";
+        return;
+      }
+
+      // Mark as custom playlist
+      playlistData.source = "custom";
+      playlistData.title = `${playlistData.title} (CUSTOM)`;
+      
+      // Add to metadata and custom playlists
+      playlistMetadata.push(playlistData);
+      customPlaylists.push(playlistData);
+      
+      // Auto-select the new playlist
+      selectedIds.add(playlistId);
+      
+      // Re-render grid
+      renderGrid(playlistMetadata);
+      updateStats();
+      
+      // Clear input
+      urlInput.value = "";
+      
+      // Reset button
+      urlBtn.disabled = false;
+      urlBtn.textContent = "ADD PLAYLIST";
+      
+    } catch (e) {
+      console.error("Failed to load custom playlist:", e);
+      alert("Failed to load playlist. Please try again.");
+      urlBtn.disabled = false;
+      urlBtn.textContent = "ADD PLAYLIST";
+    }
+  };
+
+  // Allow Enter key to submit
+  urlInput.onkeydown = (e) => {
+    if (e.key === "Enter") {
+      urlBtn.click();
+    }
+  };
+
   mfm.onclick = async () => {
     modal.classList.add("open");
     grid.innerHTML = '<div style="color:#888; text-align:center; grid-column:1/-1; padding:40px;">Loading curated playlists...</div>';
+    urlInput.value = "";  // Clear input when modal opens
     
     try {
       const trendRes = await fetch("/api/jukebox/playlists/top-music");
@@ -1203,6 +1337,7 @@ function initPlaylistSelector() {
       const staticPlaylists = metaData.playlists || [];
       
       playlistMetadata = [...trending, ...staticPlaylists];
+      customPlaylists = [];  // Reset custom playlists on refresh
       renderGrid(playlistMetadata);
       updateStats();
     } catch (e) {
