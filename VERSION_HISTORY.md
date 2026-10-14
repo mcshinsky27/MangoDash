@@ -1,3 +1,39 @@
+## v11-zodiac-history-fix (2026-10-13)
+**Fix: Separate Wurlitzer Zodiac History Modal from Playlist Selector**
+
+### Issues Fixed
+
+**1. Button Conflict**
+- Previously, clicking MFM button opened both modals simultaneously
+- Zodiac button (right) had no click handler
+
+**2. Image Display**
+- Added fallback content if image fails to load
+- Improved image CSS with proper display properties
+
+### Changes Made
+
+**JavaScript Updates**
+- Separated click handlers for each MFM button
+- Left button (MUSIC FOR MILLIONS) → Opens playlist selector
+- Right button (WURLITZER ☉ ZODIAC) → Opens history modal
+- Added `stopPropagation` to prevent event bubbling
+
+**Image Improvements**
+- Updated image URL to reliable source
+- Added onerror fallback showing decorative text
+- Added CSS for missing/broken images
+
+### Validation
+- Zodiac button opens history modal only (verified)
+- MFM button opens playlist selector only (verified)
+- No double modal popups (verified)
+- Image displays or shows fallback (verified)
+
+### Backup Files Created
+- jukebox.html.v11_zodiac_history_fix_20261013 - Fixed version
+
+---
 ## v10-zodiac-history (2026-10-13)
 **Feature: Wurlitzer Zodiac History Modal**
 
@@ -190,7 +226,7 @@
 ## v1.5-freeplay-enhanced (2026-10-13)
 **Feature: SKIP Button + 5-Second Flashing Countdown for Free Play Mode**
 
-### ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Â¯ New Features
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½Ãƒâ€šÃ‚Â¯ New Features
 
 **1. SKIP Button for Free Play**
 - New blue "SKIP" button appears next to the close (X) button on YouTube video screen
@@ -199,11 +235,11 @@
 
 **2. 5-Second Countdown with Visual Flash**
 - Changed gap from 15 seconds to 5 seconds between songs
-- Display shows countdown: "FREE PLAY ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ NEXT SONG IN 5s" ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 4s ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 3s ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 2s ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 1s
+- Display shows countdown: "FREE PLAY ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ NEXT SONG IN 5s" ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ 4s ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ 3s ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ 2s ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ 1s
 - Middle notification bar flashes yellow every second during countdown
 - Creates eye-catching visual warning before next song plays
 
-### ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â§ Technical Changes
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒâ€šÃ‚Â§ Technical Changes
 
 **File: `public/jukebox.html`**
 
@@ -238,7 +274,7 @@ const FREEPLAY_GAP_MS = 5000; // 5 seconds between songs
 
 **4. New `startFreePlayCountdown()` Function (line ~1056-1090):**
 - Creates 5-second countdown with visual flash
-- Updates display every second: 5s ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 4s ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 3s ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 2s ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 1s
+- Updates display every second: 5s ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ 4s ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ 3s ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ 2s ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ 1s
 - Adds/removes flash class for yellow pulse effect
 - Auto-cleanup when countdown completes or Free Play stops
 
@@ -251,7 +287,7 @@ const FREEPLAY_GAP_MS = 5000; // 5 seconds between songs
 - Added cleanup for `freePlayCountdownInterval`
 - Added removal of flash class when stopping Free Play
 
-### ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã¯Â¿Â½ Behavior Comparison
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÂ¯Ã‚Â¿Ã‚Â½ Behavior Comparison
 
 | Action | Before v1.5 | After v1.5 |
 |--------|-------------|------------|
@@ -260,22 +296,22 @@ const FREEPLAY_GAP_MS = 5000; // 5 seconds between songs
 | **Click X button** | Free Play stops | **Free Play stops (unchanged)** |
 | **Display message** | "NEXT SONG IN 15s" | **"NEXT SONG IN 5s" with countdown** |
 
-### ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“A Backup Files Created
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œA Backup Files Created
 - `public/jukebox.html.v5_skip_button_20261013` - SKIP button feature
 - `public/jukebox.html.v5a_skip_fix_20261013` - Fixed countdown message display
 - `public/jukebox.html.v6_5sec_countdown_flash_20261013` - 5-second countdown with flash
 - `public/jukebox.html.v6a_yellow_flash_20261013` - Yellow color flash
 - `public/jukebox.html.v7_final_20261013` - Final working copy (this version)
 
-### ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Validation
+### ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ Validation
 - SKIP button appears correctly on video screen (verified)
-- Countdown shows 5 ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 4 ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 3 ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 2 ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 1 (verified)
+- Countdown shows 5 ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ 4 ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ 3 ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ 2 ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ 1 (verified)
 - Yellow flash animation pulses every second (verified)
 - Free Play continues after SKIP (verified)
 - Free Play stops when closing with X button (verified)
 - No JavaScript errors in console
 
-### ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Âµ User Experience
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½Ãƒâ€šÃ‚Âµ User Experience
 **Before v1.5:**
 - 15-second gap between songs (feels slow)
 - Static display during countdown (easy to miss)
@@ -293,18 +329,18 @@ const FREEPLAY_GAP_MS = 5000; // 5 seconds between songs
 ## v1.4-freeplay-fixed (2026-10-10)
 **Bug Fix: Free Play Mode - Full Song Playback with 15-Second Gap**
 
-### ÃƒÂ°Ã…Â¸Ã‚ÂÃ¢â‚¬Âº Problem Identified
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚ÂÃƒÂ¢Ã¢â€šÂ¬Ã‚Âº Problem Identified
 Previous Free Play implementation had a critical flaw: songs would play for only 15 seconds before forcibly switching to the next track, cutting music mid-song. This was caused by a timer that started immediately when a song began playing, rather than waiting for the song to complete naturally.
 
-### ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Solution Implemented
+### ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ Solution Implemented
 Free Play mode now correctly:
 1. **Plays the full song** - YouTube video plays to completion without interruption
-2. **Shows countdown** - Displays "FREE PLAY ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ NEXT SONG IN 15s" when song ends
+2. **Shows countdown** - Displays "FREE PLAY ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ NEXT SONG IN 15s" when song ends
 3. **15-second gap** - Waits 15 seconds after song completion
 4. **Auto-plays next** - Randomly selects and plays next song from loaded playlist queue
 5. **Manual override preserved** - Clicking X button immediately stops Free Play and resets button to "FREE PLAY"
 
-### ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â§ Technical Changes
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒâ€šÃ‚Â§ Technical Changes
 
 **File: `public/jukebox.html`**
 
@@ -314,7 +350,7 @@ onStateChange: e => {
   if (e.data === YT.PlayerState.ENDED) {
     stopYt(false);  // false = don't skip Free Play timer
     if (freePlayActive) {
-      setProg("FREE PLAY ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ NEXT SONG IN 15s");
+      setProg("FREE PLAY ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ NEXT SONG IN 15s");
       freePlayTimer = setTimeout(() => {
         if (freePlayActive) playNextFreePlayTrack();
       }, FREEPLAY_GAP_MS);  // 15000ms = 15 seconds
@@ -340,14 +376,14 @@ function stopYt(skipFreePlayTimer) {
 }
 ```
 - Added `skipFreePlayTimer` parameter
-- When X button is clicked: `stopYt(true)` ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ calls `stopFreePlay()` ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ button resets to "FREE PLAY"
-- When song ends naturally: `stopYt(false)` ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ timer starts for next song
+- When X button is clicked: `stopYt(true)` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ calls `stopFreePlay()` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ button resets to "FREE PLAY"
+- When song ends naturally: `stopYt(false)` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ timer starts for next song
 
-### ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â Backup Files Created
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒâ€šÃ‚Â Backup Files Created
 - `public/jukebox.html.bak_freeplay_fix` - Original broken version (before fix)
 - `public/jukebox.html.bak_working_freeplay_fixed` - Current working version (this fix)
 
-### ÃƒÂ°Ã…Â¸Ã‚Â§Ã‚Âª How to Restore If Context Lost
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â§Ãƒâ€šÃ‚Âª How to Restore If Context Lost
 If this fix is accidentally overwritten or corrupted, restore using PowerShell:
 
 ```powershell
@@ -357,20 +393,20 @@ Copy-Item -Path "C:\MangoDash\public\jukebox.html.bak_working_freeplay_fixed" -D
 # Or manually apply the three changes listed above
 ```
 
-### ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Validation
+### ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ Validation
 - Songs play to completion (verified by user)
 - 15-second gap between songs (verified by user)
 - Button correctly resets to "FREE PLAY" when manually closing video (verified by user)
 - No JavaScript errors in console
 - File structure intact (1195 lines, ends correctly)
 
-### ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Âµ User Experience
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½Ãƒâ€šÃ‚Âµ User Experience
 **Before Fix:**
-- Song plays 15 seconds ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ forcibly cuts off ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ next song starts
+- Song plays 15 seconds ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ forcibly cuts off ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ next song starts
 - Frustrating, incomplete music experience
 
 **After Fix:**
-- Song plays full duration ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 15-second pause ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ next song starts
+- Song plays full duration ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ 15-second pause ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ next song starts
 - Natural jukebox behavior, complete songs
 
 ---
@@ -378,7 +414,7 @@ Copy-Item -Path "C:\MangoDash\public\jukebox.html.bak_working_freeplay_fixed" -D
 ## v1.3-playlists-enhanced (2026-10-08)
 **Feature: Dynamic Top 10 Music Playlists & Improved Playlist Selector Typography**
 
-### ÃƒÂ°Ã…Â¸Ã…Â½Ã¢â‚¬Â° New Features
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â° New Features
 - **Truly Dynamic Top 10 Playlists** - Automatically fetches trending music content from YouTube's API
 - **Real-Time Ranking Updates** - Playlist IDs change when YouTube's trending music changes (every 24-hour refresh)
 - **24-Hour Smart Cache** - Refreshes metadata AND playlist IDs every 24 hours to conserve API quota
@@ -386,12 +422,12 @@ Copy-Item -Path "C:\MangoDash\public\jukebox.html.bak_working_freeplay_fixed" -D
 - **Improved Typography** - Playlist titles now wrap properly with larger, more readable fonts
 - **Merged Playlist View** - Top 10 trending playlists displayed first, followed by static library
 
-### ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â Bug Fixes
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒâ€šÃ‚Â Bug Fixes
 - **Fixed Text Truncation** - Playlist titles now wrap across multiple lines instead of being cut off with ellipsis
 - **Consistent Font Sizing** - All playlist titles use responsive clamp() sizing for better readability
 - **Better Grid Layout** - Improved spacing and alignment in playlist selector modal
 
-### ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã¢â‚¬Â¹ Technical Changes
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ Technical Changes
 
 **Server (`server/server.js`):**
 - **Dynamic Fetch Logic**: Queries YouTube's `videos.list?chart=mostPopular&categoryId=10` for trending music videos
@@ -409,7 +445,7 @@ Copy-Item -Path "C:\MangoDash\public\jukebox.html.bak_working_freeplay_fixed" -D
 - Added `.playlist-title-wrapper` and `.playlist-title-badge` CSS classes
 - Modified grid sorting to show trending playlists first
 
-### ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ¢â‚¬Å¾ How Dynamic Updates Work
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾ How Dynamic Updates Work
 
 **Every 24 Hours (or when cache expires):**
 
@@ -427,7 +463,7 @@ Copy-Item -Path "C:\MangoDash\public\jukebox.html.bak_working_freeplay_fixed" -D
 - The playlist IDs in the cache will differ from previous day
 - Next refresh will show the new trending playlists
 
-### ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Âµ Response Format
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½Ãƒâ€šÃ‚Âµ Response Format
 
 ```json
 {
@@ -449,7 +485,7 @@ Copy-Item -Path "C:\MangoDash\public\jukebox.html.bak_working_freeplay_fixed" -D
 }
 ```
 
-### ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Â¨ Visual Enhancements
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½Ãƒâ€šÃ‚Â¨ Visual Enhancements
 - **TRENDING Badge** - Red gradient badge with white text and shadow
 - **Text Wrapping** - Titles display up to 3 lines with proper line height
 - **Responsive Font** - clamp(14px, 1.5vw, 18px) for optimal readability
@@ -461,7 +497,7 @@ Copy-Item -Path "C:\MangoDash\public\jukebox.html.bak_working_freeplay_fixed" -D
 ## v1.2-coin-slot-realistic (2026-10-07)
 **Feature: Realistic Coin Slot with Venmo Payment**
 
-### ÃƒÂ°Ã…Â¸Ã…Â½Ã¢â‚¬Â° New Features
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â° New Features
 - **Realistic Coin Slot** - Chrome plate with vertical slot, INSERT COIN plate, and coin exit (like arcade machines)
 - **Interactive Animation** - Coin drops through slot when clicked with sound effects
 - **Payment Modal** - Beautiful vintage-styled Venmo payment popup
@@ -469,11 +505,11 @@ Copy-Item -Path "C:\MangoDash\public\jukebox.html.bak_working_freeplay_fixed" -D
 - **Hidden Until Hover** - Subtle until user interacts
 - **Responsive Positioning** - Coin slot now properly positioned on the right side of the lower chrome bar using flexbox
 
-### ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â Bug Fixes
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒâ€šÃ‚Â Bug Fixes
 - **Fixed Coin Slot Positioning** - Changed from absolute positioning to flexbox layout to ensure the coin slot stays within the `.keyrow` container and appears on the right side like the Free Play button
 - **Removed Overflow Issues** - Coin slot no longer overlaps or extends outside the lower chrome bar on any screen size
 
-### ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Â° How It Works
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½Ãƒâ€šÃ‚Â° How It Works
 1. **Coin slot visible** - Chrome plate with vertical slot on lower right chrome bar
 2. **Hover** - Plate glows with subtle white highlight
 3. **Click** - Coin drops through slot animation + metal clunk sound
@@ -481,7 +517,7 @@ Copy-Item -Path "C:\MangoDash\public\jukebox.html.bak_working_freeplay_fixed" -D
 5. **Click Venmo button** - Opens venmo.com/RobMc27 in new tab
 6. **Close** - Click X, click outside, or press Escape
 
-### ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Â¨ Visual Design
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½Ãƒâ€šÃ‚Â¨ Visual Design
 
 **Coin Slot:**
 - Chrome plate (70x120px) with textured metallic finish
@@ -494,17 +530,17 @@ Copy-Item -Path "C:\MangoDash\public\jukebox.html.bak_working_freeplay_fixed" -D
 - Hover: Subtle white glow around plate
 
 **Payment Modal:**
-- Dark gradient background (#1a1a2e ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ #16213e)
+- Dark gradient background (#1a1a2e ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ #16213e)
 - Gold border with glow
 - Rotating radial gradient overlay
-- Header: "ÃƒÂ°Ã…Â¸Ã‚ÂªÃ¢â€žÂ¢ THANK YOU! ÃƒÂ°Ã…Â¸Ã‚ÂªÃ¢â€žÂ¢" in gold
+- Header: "ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚ÂªÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ THANK YOU! ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚ÂªÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢" in gold
 - Amount: "ONE QUARTER" in gold gradient text
 - Message: "For this fine musical entertainment"
 - Venmo button: Bright blue gradient, large and clickable
 - Handle: "@RobMc27" displayed below
 - Close button: Top right, rotates on hover
 
-### ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ…Â  Sound Effects
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒâ€¦Ã‚Â  Sound Effects
 
 **Coin Drop:**
 - Metal clunk with lowpass filter
@@ -517,7 +553,7 @@ Copy-Item -Path "C:\MangoDash\public\jukebox.html.bak_working_freeplay_fixed" -D
 - 1.5 second decay
 - Cheerful, celebratory feel
 
-### ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã¢â‚¬Â¹ Technical Changes
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ Technical Changes
 
 **File:** `public/jukebox.html`
 
@@ -535,7 +571,7 @@ Copy-Item -Path "C:\MangoDash\public\jukebox.html.bak_working_freeplay_fixed" -D
 - Coin slot is now the last child of `.keyrow`, ensuring it appears on the right side
 - Maintains all existing functionality (click handler, drop animation, sound effects)
 
-### ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Â¯ User Experience
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½Ãƒâ€šÃ‚Â¯ User Experience
 
 **Discovery:**
 - Subtle brass slot on right side
@@ -556,7 +592,7 @@ Copy-Item -Path "C:\MangoDash\public\jukebox.html.bak_working_freeplay_fixed" -D
 - Clear close button
 - Screen reader friendly
 
-### ÃƒÂ°Ã…Â¸Ã…Â¡Ã¢â€šÂ¬ Use Cases
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â¡ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Use Cases
 
 **Monetization:**
 - Passive donation mechanism
@@ -570,7 +606,7 @@ Copy-Item -Path "C:\MangoDash\public\jukebox.html.bak_working_freeplay_fixed" -D
 - Conversation starter
 - Professional polish
 
-### ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â Configuration
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒâ€šÃ‚Â Configuration
 
 **Venmo Link:**
 ```html
@@ -583,7 +619,7 @@ const coinDropDelay = 300; // ms before modal shows
 const chimeDuration = 1500; // ms chord decay
 ```
 
-### ÃƒÂ¢Ã‚Â­Ã‚Â Future Enhancements
+### ÃƒÆ’Ã‚Â¢Ãƒâ€šÃ‚Â­Ãƒâ€šÃ‚Â Future Enhancements
 - [ ] Multiple coin denominations (nickel, dime, quarter)
 - [ ] Different payment methods (PayPal, CashApp)
 - [ ] Coin collection counter
@@ -596,29 +632,29 @@ const chimeDuration = 1500; // ms chord decay
 ## v1.1-freeplay (2026-10-07)
 **Feature: Free Play Mode with 15-Second Intervals**
 
-### ÃƒÂ°Ã…Â¸Ã…Â½Ã¢â‚¬Â° New Features
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â° New Features
 - **Free Play Button** - Automatic continuous playback with random song selection
 - **15-Second Gaps** - Professional DJ-like pauses between full songs
 - **Smart Queue Management** - Shuffles all loaded tracks at start
 - **Visual Feedback** - Button pulses gold when active, turns red during playback
-- **Progress Tracking** - Shows "FREE PLAY ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ X/200" in progress window
+- **Progress Tracking** - Shows "FREE PLAY ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ X/200" in progress window
 - **Auto-Cancel on Close** - YouTube window close stops Free Play immediately
 - **Manual Override** - Any manual selection cancels Free Play
 
-### ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Âµ How It Works
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½Ãƒâ€šÃ‚Âµ How It Works
 1. **Click "FREE PLAY"** - Button turns red and shows "STOP"
 2. **First song plays immediately** - All tracks shuffled into queue
 3. **Song plays to completion** - Full track plays
-4. **15-second gap** - Progress shows "FREE PLAY ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ WAITING 15s..."
+4. **15-second gap** - Progress shows "FREE PLAY ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ WAITING 15s..."
 5. **Next random song plays** - From remaining queue
 6. **Repeat** - Until queue empty or user stops
 
-### ÃƒÂ°Ã…Â¸Ã…Â½Ã¢â‚¬ÂºÃƒÂ¯Ã‚Â¸Ã‚Â User Controls
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂºÃƒÆ’Ã‚Â¯Ãƒâ€šÃ‚Â¸Ãƒâ€šÃ‚Â User Controls
 - **Start:** Click "FREE PLAY" button (gold, pulsing)
 - **Stop:** Click "STOP" button (red, solid)
 - **Cancel:** Close YouTube window or make manual selection
 
-### ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã¢â‚¬Â¹ Technical Changes
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ Technical Changes
 **File:** `public/jukebox.html`
 
 **CSS Added (Lines 209-234):**
@@ -643,36 +679,36 @@ const chimeDuration = 1500; // ms chord decay
 const FREEPLAY_GAP_MS = 15000; // 15 seconds between songs
 ```
 
-### ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Â¨ Visual Design
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½Ãƒâ€šÃ‚Â¨ Visual Design
 **Button States:**
 - **Inactive:** Gold gradient, pulsing glow, shows "FREE PLAY"
 - **Active:** Red gradient, solid, shows "STOP"
 - **Hover:** Enhanced glow, slight lift effect
 
 **Progress Display:**
-- During playback: "FREE PLAY ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ 23/200"
-- During gap: "FREE PLAY ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ WAITING 15s..."
+- During playback: "FREE PLAY ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ 23/200"
+- During gap: "FREE PLAY ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ WAITING 15s..."
 - After stop: "MAKE SELECTION"
 
-### ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â§ Integration Points
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒâ€šÃ‚Â§ Integration Points
 - **YouTube Player:** Hooks into `onStateChange` ENDED event
 - **Spotify:** Uses existing polling for progress monitoring
 - **Manual Selection:** Overrides Free Play automatically
 - **YouTube Close:** Cancels Free Play immediately
 
-### ÃƒÂ°Ã…Â¸Ã…Â¡Ã¢â€šÂ¬ Use Cases
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â¡ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Use Cases
 - **Event Background Music** - Continuous entertainment
 - **Demo Mode** - Showcase playlist variety
 - **Hands-Off Operation** - Set it and forget it
 - **Quick Previews** - 15s gap gives taste of each song
 
-### ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â Known Behaviors
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒâ€šÃ‚Â Known Behaviors
 - Queue shuffles once at start (no reshuffling)
 - Songs play to completion (no skipping)
 - 15-second gap is fixed (not configurable yet)
 - Manual interaction stops Free Play
 
-### ÃƒÂ¢Ã‚Â­Ã‚Â Future Enhancements
+### ÃƒÆ’Ã‚Â¢Ãƒâ€šÃ‚Â­Ãƒâ€šÃ‚Â Future Enhancements
 - [ ] Configurable gap duration (fast/normal/slow)
 - [ ] Loop mode (reshuffle when queue empty)
 - [ ] Skip/next button
@@ -685,15 +721,15 @@ const FREEPLAY_GAP_MS = 15000; // 15 seconds between songs
 ## v1.0-playlist-selector (2026-10-07)
 **Major Feature: Playlist Selector with Multi-Playlist Support**
 
-### ÃƒÂ°Ã…Â¸Ã…Â½Ã¢â‚¬Â° New Features
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â° New Features
 - **Animated Playlist Selector Modal** - Beautiful dropdown interface when clicking "MUSIC FOR MILLIONS"
 - **Multi-Playlist Selection** - Users can select 1-25 playlists to populate the jukebox
 - **Dynamic YouTube API Integration** - Automatically fetches playlist titles and track counts
 - **Pre-Selected Defaults** - Configurable default playlists that load on first use
-- **Live Selection Counter** - Shows "X PLAYLISTS ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ Y TRACKS" in real-time
+- **Live Selection Counter** - Shows "X PLAYLISTS ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ Y TRACKS" in real-time
 - **Enhanced Visual Effects** - Smooth animations, hover states, and pulse feedback
 
-### ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã¢â‚¬Â¹ Technical Changes
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ Technical Changes
 **Server (`server/server.js`):**
 - Added `/api/display/:deviceId/playlists/metadata` endpoint
 - Fetches YouTube playlist data securely (hides API key)
@@ -706,10 +742,10 @@ const FREEPLAY_GAP_MS = 15000; // 15 seconds between songs
 - Configured 8 YouTube playlists in library
 - Set 2 default pre-selected playlists
 
-### ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Âµ Playlist Configuration
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½Ãƒâ€šÃ‚Âµ Playlist Configuration
 **Available Playlists:**
-1. PLOHoVaTp8R7d3L_pjuwIa6nRh4tH5nI4x ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ (default)
-2. PLOHoVaTp8R7f9GV4HW3joHrz4Oq16QBph ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ (default)
+1. PLOHoVaTp8R7d3L_pjuwIa6nRh4tH5nI4x ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ (default)
+2. PLOHoVaTp8R7f9GV4HW3joHrz4Oq16QBph ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ (default)
 3. PLr_3_vOUiFjDDLaRNKmAnqbc-uzgRdfNu
 4. PL2N_sVGOb3clqyWSLspkp8BAv4FBfBaxH
 5. PLkqz3S84Tw-TPCtKs1vw8AnRcGhms67h3
@@ -717,19 +753,19 @@ const FREEPLAY_GAP_MS = 15000; // 15 seconds between songs
 7. PLAxT_DkSwQLuq9R351Vp9kVGbE4TiMzQ6
 8. PLplXQ2cg9B_o1X-Knd5wgbAi-YDTSbmy-
 
-### ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â§ Bug Fixes
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒâ€šÃ‚Â§ Bug Fixes
 - Fixed multi-playlist loading (comma-separated IDs)
 - Fixed "forbidden" error on public endpoint
 - Added support for full YouTube URLs with playlist IDs
 - Fixed "MUSIC FOR MILLIONS" box click handler (added missing `id="seeburg"`)
 
-### ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã…Â¡ Documentation
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒâ€¦Ã‚Â¡ Documentation
 - Created `PLAYLIST_SELECTOR_GUIDE.md` - Complete user and developer guide
 - Created `MULTI_PLAYLIST_GUIDE.md` - Multi-playlist loading documentation
 - Created `DEPLOYMENT_GUIDE.md` - Production deployment instructions
 - Created `VERSION_HISTORY.md` - This file
 
-### ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Â¨ Visual Enhancements
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â½Ãƒâ€šÃ‚Â¨ Visual Enhancements
 - Modal fade-in with scale and slide animations
 - Loading spinner for YouTube API calls
 - Playlist item hover effects with shimmer
@@ -737,7 +773,7 @@ const FREEPLAY_GAP_MS = 15000; // 15 seconds between songs
 - Responsive design for mobile and desktop
 - Enhanced "MUSIC FOR MILLIONS" box with hover indicator
 
-### ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ¢â‚¬â€ URLs
+### ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â URLs
 **Default (empty jukebox):**
 ```
 https://dash.mcshinsky.com/jukebox.html
@@ -756,5 +792,5 @@ https://dash.mcshinsky.com/jukebox.html?playlist=PLOHoVaTp8R7d3L_pjuwIa6nRh4tH5n
 ---
 
 **Last Updated:** 2026-10-07  
-**Status:** ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Production Ready  
+**Status:** ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ Production Ready  
 **Next Milestone:** TBD
