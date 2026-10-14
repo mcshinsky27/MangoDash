@@ -654,6 +654,17 @@ html, body { width: 100%; height: 100%; overflow: hidden;
   border-radius: 8px;
   border: 3px solid rgba(212, 175, 55, 0.4);
   box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  display: block;
+  margin: 0 auto;
+}
+.zodiac-history-image img[src=""],
+.zodiac-history-image img:not([src]) {
+  background: rgba(255,255,255,0.05);
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
 }
 .zodiac-history-section {
   margin: 25px 0;
@@ -809,7 +820,7 @@ html, body { width: 100%; height: 100%; overflow: hidden;
     </div>
     
     <div class="zodiac-history-image">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Wurlitzer_109_Jukebox.jpg/800px-Wurlitzer_109_Jukebox.jpg" alt="Wurlitzer Zodiac Jukebox">
+      <img src="https://jukeboxhitz.com/wp-content/uploads/2017/08/Wurlitzer-1400-Zodiac-Color.jpg" alt="Wurlitzer Zodiac Jukebox" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'padding:60px;color:#888;font-style:italic;\'>🎵 Classic Wurlitzer Zodiac Jukebox 🎵</div>';">
     </div>
     
     <div class="zodiac-history-section">
@@ -879,13 +890,17 @@ let lastSelectTime = 0;
 const zodiacHistoryModal = document.getElementById("zodiacHistoryModal");
 const zodiacHistoryClose = document.getElementById("zodiacHistoryClose");
 
-// Open modal when clicking MFM button
-document.querySelector(".mfm").addEventListener("click", (e) => {
-  // Check if clicking the MFM button (not the playlist modal)
-  if (e.target.classList.contains("mfm") && e.target.textContent === "MUSIC FOR MILLIONS") {
+// Get all MFM buttons
+const allMfmButtons = document.querySelectorAll(".mfm");
+
+// Right MFM button (WURLITZER ZODIAC) opens history modal
+if (allMfmButtons.length >= 2) {
+  const zodiacButton = allMfmButtons[1]; // Second MFM button
+  zodiacButton.addEventListener("click", (e) => {
+    e.stopPropagation();
     zodiacHistoryModal.classList.add("active");
-  }
-});
+  });
+}
 
 // Close modal
 zodiacHistoryClose.addEventListener("click", () => {
