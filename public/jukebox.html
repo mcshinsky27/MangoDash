@@ -917,6 +917,7 @@ function stopYt(mode) {
     freePlayTimer = setTimeout(() => {
       if (freePlayActive) playNextFreePlayTrack();
     }, FREEPLAY_GAP_MS);
+    return;  // Don't reset to "MAKE SELECTION" - show the countdown message
   }
   
   setProg("MAKE SELECTION");
