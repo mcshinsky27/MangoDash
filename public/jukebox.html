@@ -820,7 +820,7 @@ html, body { width: 100%; height: 100%; overflow: hidden;
     </div>
     
     <div class="zodiac-history-image">
-      <img src="https://jukeboxhitz.com/wp-content/uploads/2017/08/Wurlitzer-1400-Zodiac-Color.jpg" alt="Wurlitzer Zodiac Jukebox" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'padding:60px;color:#888;font-style:italic;\'>🎵 Classic Wurlitzer Zodiac Jukebox 🎵</div>';">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgAJ9JAznQsyM9Q-lCKUCKtkxfgukSwCfL9paavhWHoNOSYIo4zRQ0VndD&s=10" alt="Wurlitzer Zodiac Jukebox" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'padding:60px;color:#888;font-style:italic;\'>🎵 Classic Wurlitzer Zodiac Jukebox 🎵</div>';">
     </div>
     
     <div class="zodiac-history-section">
@@ -1541,7 +1541,11 @@ const PLAYLIST_LIBRARY = [
   "PLkqz3S84Tw-TPCtKs1vw8AnRcGhms67h3",
   "PLK1Ccv_vyLIw5E8zWwZt1OlmMIvO4mrwD",
   "PLAxT_DkSwQLuq9R351Vp9kVGbE4TiMzQ6",
-  "PLplXQ2cg9B_o1X-Knd5wgbAi-YDTSbmy-"
+  "PLplXQ2cg9B_o1X-Knd5wgbAi-YDTSbmy-",
+  "PLxA687tYuMWihUzDhIATg7dQZ8yHleicO",
+  "PLIwJWxu5kev-9Q9lOra6INRB3vubow3_9",
+  "PLC6703FD73E92B268",
+  "PLbJW0WGne7gpSWZv_QJ-wK2SbMeLDc7fE"
 ];
 const DEFAULT_SELECTED_PLAYLISTS = [
   "PLOHoVaTp8R7d3L_pjuwIa6nRh4tH5nI4x",
@@ -1706,7 +1710,28 @@ function initPlaylistSelector() {
       const staticIds = PLAYLIST_LIBRARY.join(",");
       const metaRes = await fetch(`/api/jukebox/playlists/metadata?ids=${staticIds}`);
       const metaData = await metaRes.json();
-      const staticPlaylists = metaData.playlists || [];
+      let staticPlaylists = metaData.playlists || [];
+      
+      // Merge Noah Kahan playlists into one entry
+      const noahKahanIds = ["PLxA687tYuMWihUzDhIATg7dQZ8yHleicO", "PLIwJWxu5kev-9Q9lOra6INRB3vubow3_9"];
+      const noahKahanPlaylists = staticPlaylists.filter(p => noahKahanIds.includes(p.id));
+      
+      if (noahKahanPlaylists.length > 0) {
+        // Calculate combined track count
+        const totalTracks = noahKahanPlaylists.reduce((sum, p) => sum + (p.trackCount || 0), 0);
+        // Create merged playlist entry
+        const mergedNoahKahan = {
+          id: "NOAH_KAHAN_COMBINED",
+          title: "Noah Kahan - Complete Collection",
+          trackCount: totalTracks,
+          source: "static",
+          isMerged: true,
+          mergedPlaylistIds: noahKahanIds
+        };
+        // Filter out individual Noah Kahan playlists and add merged one
+        staticPlaylists = staticPlaylists.filter(p => !noahKahanIds.includes(p.id));
+        staticPlaylists.push(mergedNoahKahan);
+      }
       
       playlistMetadata = [...trending, ...staticPlaylists];
       customPlaylists = [];  // Reset custom playlists on refresh
@@ -1721,7 +1746,18 @@ function initPlaylistSelector() {
   modal.onclick = (e) => { if (e.target === modal) modal.classList.remove("open"); };
 
   loadBtn.onclick = () => {
-    playlist = Array.from(selectedIds).join(",");
+    // Expand merged playlist IDs to actual playlist IDs
+    const expandedIds = [];
+    for (const id of selectedIds) {
+      if (id === "NOAH_KAHAN_COMBINED") {
+        // Replace merged ID with actual Noah Kahan playlist IDs
+        expandedIds.push("PLxA687tYuMWihUzDhIATg7dQZ8yHleicO");
+        expandedIds.push("PLIwJWxu5kev-9Q9lOra6INRB3vubow3_9");
+      } else {
+        expandedIds.push(id);
+      }
+    }
+    playlist = expandedIds.join(",");
     modal.classList.remove("open");
     loadTracks();
   };
