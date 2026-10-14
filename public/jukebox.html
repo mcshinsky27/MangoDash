@@ -583,6 +583,181 @@ html, body { width: 100%; height: 100%; overflow: hidden;
 }
 .playlist-load-btn:hover { background: #ffcf64; transform: scale(1.05); }
 .playlist-load-btn:disabled { background: #555; color: #888; cursor: not-allowed; }
+
+/* ============ Wurlitzer Zodiac History Modal ============ */
+.zodiac-history-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(4, 8, 14, 0.95);
+  backdrop-filter: blur(6px);
+  animation: modalFadeIn 0.3s ease-out;
+}
+.zodiac-history-modal.active {
+  display: flex;
+}
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.zodiac-history-content {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  border: 4px solid #d4af37;
+  border-radius: 20px;
+  padding: 40px 50px;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 0 50px rgba(212, 175, 55, 0.5), 0 15px 50px rgba(0,0,0,0.7);
+  position: relative;
+  animation: modalPopScale 0.3s ease-out;
+}
+@keyframes modalPopScale {
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.zodiac-history-header {
+  text-align: center;
+  margin-bottom: 30px;
+  border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+  padding-bottom: 20px;
+}
+.zodiac-history-title {
+  font-size: clamp(18px, 2.5vw, 28px);
+  color: #ffd700;
+  letter-spacing: 4px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  text-shadow: 0 0 15px rgba(255,215,0,0.7);
+}
+.zodiac-history-subtitle {
+  font-size: clamp(12px, 1.4vw, 16px);
+  color: #c9a227;
+  letter-spacing: 2px;
+  font-style: italic;
+  opacity: 0.9;
+}
+.zodiac-history-image {
+  text-align: center;
+  margin: 25px 0;
+  padding: 20px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 12px;
+  border: 2px solid rgba(212, 175, 55, 0.2);
+}
+.zodiac-history-image img {
+  max-width: 100%;
+  max-height: 350px;
+  border-radius: 8px;
+  border: 3px solid rgba(212, 175, 55, 0.4);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+}
+.zodiac-history-section {
+  margin: 25px 0;
+  padding: 20px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 10px;
+  border-left: 4px solid #d4af37;
+}
+.zodiac-history-section h3 {
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: #ffd700;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+  text-shadow: 0 0 8px rgba(255,215,0,0.5);
+}
+.zodiac-history-section p {
+  font-size: clamp(11px, 1.3vw, 14px);
+  color: #cfd6dd;
+  line-height: 1.7;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+.zodiac-history-section ul {
+  margin: 15px 0;
+  padding-left: 20px;
+  color: #cfd6dd;
+  font-size: clamp(11px, 1.3vw, 14px);
+  line-height: 1.8;
+}
+.zodiac-history-section li {
+  margin: 8px 0;
+}
+.zodiac-timeline {
+  margin: 20px 0;
+  padding: 20px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 10px;
+}
+.zodiac-timeline-item {
+  display: flex;
+  gap: 15px;
+  margin: 15px 0;
+  padding: 15px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+.zodiac-timeline-year {
+  font-size: clamp(16px, 2vw, 24px);
+  font-weight: bold;
+  color: #ffd700;
+  min-width: 80px;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(255,215,0,0.5);
+}
+.zodiac-timeline-content {
+  flex: 1;
+}
+.zodiac-timeline-title {
+  font-size: clamp(12px, 1.4vw, 16px);
+  color: #c9a227;
+  font-weight: bold;
+  margin-bottom: 6px;
+  letter-spacing: 1px;
+}
+.zodiac-timeline-text {
+  font-size: clamp(10px, 1.2vw, 13px);
+  color: #cfd6dd;
+  line-height: 1.6;
+}
+.zodiac-history-close {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  background: rgba(212, 175, 55, 0.2);
+  border: 2px solid #d4af37;
+  color: #ffd700;
+  font-size: clamp(20px, 2.5vw, 32px);
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  line-height: 1;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+}
+.zodiac-history-close:hover {
+  background: #d4af37;
+  color: #1a1a2e;
+  transform: rotate(90deg);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+}
+.zodiac-history-footer {
+  text-align: center;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+  color: #888;
+  font-size: clamp(10px, 1.2vw, 12px);
+  letter-spacing: 1px;
+}
 .mfm { cursor: pointer; transition: all 0.2s ease; }
 .mfm:hover { background: #1a140d; box-shadow: 0 0 15px #ff9d2e; }
 .mfm::after { content: " ▼"; font-size: 0.7em; opacity: 0.6; margin-left: 4px; }
@@ -625,6 +800,71 @@ html, body { width: 100%; height: 100%; overflow: hidden;
     </div>
   </div>
 </div>
+<div id="zodiacHistoryModal" class="zodiac-history-modal">
+  <div class="zodiac-history-content">
+    <button type="button" class="zodiac-history-close" id="zodiacHistoryClose">&times;</button>
+    <div class="zodiac-history-header">
+      <div class="zodiac-history-title">WURLITZER ZODIAC</div>
+      <div class="zodiac-history-subtitle">The Legend of American Jukeboxes</div>
+    </div>
+    
+    <div class="zodiac-history-image">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Wurlitzer_109_Jukebox.jpg/800px-Wurlitzer_109_Jukebox.jpg" alt="Wurlitzer Zodiac Jukebox">
+    </div>
+    
+    <div class="zodiac-history-section">
+      <h3>� musical Innovation</h3>
+      <p>The Wurlitzer Zodiac represents one of the most iconic designs in juukebox history. Introduced in the late 1950s, the Zodiac model brought a new level of sophistication and visual appeal to the American juuxebox scene.</p>
+      <p>Known for its distinctive starburst pattern and vibrant color options, the Zodiac was more than just a music player—it was a work of art that transformed any space into a nostalgic entertainment venue.</p>
+    </div>
+    
+    <div class="zodiac-timeline">
+      <div class="zodiac-timeline-item">
+        <div class="zodiac-timeline-year">1959</div>
+        <div class="zodiac-timeline-content">
+          <div class="zodiac-timeline-title">The Zodiac Arrives</div>
+          <div class="zodiac-timeline-text">Wurlitzer introduces the Model 1300 Zodiac, featuring revolutionary starburst lighting patterns and advanced selection technology.</div>
+        </div>
+      </div>
+      <div class="zodiac-timeline-item">
+        <div class="zodiac-timeline-year">1960s</div>
+        <div class="zodiac-timeline-content">
+          <div class="zodiac-timeline-title">Golden Era</div>
+          <div class="zodiac-timeline-text">The Zodiac becomes a symbol of American pop culture, appearing in diners, arcades, and entertainment venues across the nation.</div>
+        </div>
+      </div>
+      <div class="zodiac-timeline-item">
+        <div class="zodiac-year">1970s</div>
+        <div class="zodiac-timeline-content">
+          <div class="zodiac-timeline-title">Production Ends</div>
+          <div class="zodiac-timeline-text">As the jukebox industry evolves, the Zodiac ceases production, becoming a highly sought-after collector's item.</div>
+        </div>
+      </div>
+      <div class="zodiac-timeline-item">
+        <div class="zodiac-timeline-year">Today</div>
+        <div class="zodiac-timeline-content">
+          <div class="zodiac-timeline-title">Living Legacy</div>
+          <div class="zodiac-timeline-text">Restored Wurlitzer Zodiac jukeboxes continue to bring joy and nostalgia, preserving the golden age of American music entertainment.</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="zodiac-history-section">
+      <h3>🎨 Design Features</h3>
+      <ul>
+        <li><strong>Starburst Lighting:</</strong> Iconic zodiac star patterns with colorful LED-like effects</li>
+        <li><strong>Vibrant Colors:</strong> Available in multiple eye-catching finishes</li>
+        <li><strong>Selection Grid:</strong> Easy-to-use button system for song selection</li>
+        <li><strong>Chrome Accents:</strong> Polished brass and chrome detailing</li>
+        <li><strong>Marquee Display:</strong> Illuminated song title display</li>
+      </ul>
+    </div>
+    
+    <div class="zodiac-history-footer">
+      Preserving the Legacy of American Jukebox Excellence
+    </div>
+  </div>
+</div>
 <script>
 const qs = new URLSearchParams(location.search);
 const deviceId = qs.get("device") || localStorage.getItem("mango-device");
@@ -634,6 +874,37 @@ const DIGITS = ["1","2","3","4","5","6","7","8","9","0"];
 let tracks = [], selLetter = null, playingCard = null;
 let provider = "spotify";   // "spotify" (server-side playback) or "youtube" (local CRT screen)
 let lastSelectTime = 0;
+
+// Zodiac History Modal
+const zodiacHistoryModal = document.getElementById("zodiacHistoryModal");
+const zodiacHistoryClose = document.getElementById("zodiacHistoryClose");
+
+// Open modal when clicking MFM button
+document.querySelector(".mfm").addEventListener("click", (e) => {
+  // Check if clicking the MFM button (not the playlist modal)
+  if (e.target.classList.contains("mfm") && e.target.textContent === "MUSIC FOR MILLIONS") {
+    zodiacHistoryModal.classList.add("active");
+  }
+});
+
+// Close modal
+zodiacHistoryClose.addEventListener("click", () => {
+  zodiacHistoryModal.classList.remove("active");
+});
+
+// Close on escape key
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && zodiacHistoryModal.classList.contains("active")) {
+    zodiacHistoryModal.classList.remove("active");
+  }
+});
+
+// Close on clicking outside content
+zodiacHistoryModal.addEventListener("click", (e) => {
+  if (e.target === zodiacHistoryModal) {
+    zodiacHistoryModal.classList.remove("active");
+  }
+});
 
 const prog = document.getElementById("prog");
 function setProg(t) { prog.textContent = t; }
