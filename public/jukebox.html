@@ -423,6 +423,24 @@ html, body { width: 100%; height: 100%; overflow: hidden;
   text-align: left;
   margin-right: 12px;
 }
+.screen-skip {
+  background: #1976d2;
+  border: 1px solid #64b5f6;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: clamp(10px, 1.1vw, 14px);
+  padding: 4px 10px;
+  line-height: 1;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.screen-skip:hover {
+  background: #2196f5;
+}
 .screen-close {
   background: #bf360c;
   border: 1px solid #ff7043;
@@ -648,6 +666,7 @@ videoScreen.id = "video-screen";
 videoScreen.innerHTML = `
   <div class="screen-header">
     <span class="screen-title" id="screen-song-title">YOUTUBE SCREEN</span>
+    <button type="button" class="screen-skip" id="screen-skip-btn">SKIP</button>
     <button type="button" class="screen-close" id="screen-close-btn">&times;</button>
   </div>
   <div id="yt-player-container">
@@ -877,7 +896,8 @@ function startYt(track) {
   if (ytReady && p.loadVideoById) p.loadVideoById(track.uri);
   else ytPending = track.uri;
 }
-function stopYt(skipFreePlayTimer) {
+function stopYt(mode) {
+  // mode: 'close' = stop Free Play completely, 'skip' = continue Free Play with 15s timer
   notifyPlaying(false);
   if (ytPlayer && ytPlayer.stopVideo) { try { ytPlayer.stopVideo(); } catch (e) { /* player gone */ } }
   document.getElementById("video-screen").style.display = "none";
@@ -888,12 +908,21 @@ function stopYt(skipFreePlayTimer) {
     playingCard.el.classList.remove("playing");
     playingCard = null;
   }
-  if (skipFreePlayTimer && freePlayActive) {
-    stopFreePlay();
+  
+  if (mode === 'close' && freePlayActive) {
+    stopFreePlay();  // Stop Free Play completely when closing window
+  } else if (mode === 'skip' && freePlayActive) {
+    // Start 15-second countdown to next song, keep Free Play running
+    setProg("FREE PLAY • NEXT SONG IN 15s");
+    freePlayTimer = setTimeout(() => {
+      if (freePlayActive) playNextFreePlayTrack();
+    }, FREEPLAY_GAP_MS);
   }
+  
   setProg("MAKE SELECTION");
 }
-document.getElementById("screen-close-btn").onclick = () => { clickSound(); stopYt(true); };
+document.getElementById("screen-skip-btn").onclick = () => { clickSound(); stopYt('skip'); };
+document.getElementById("screen-close-btn").onclick = () => { clickSound(); stopYt('close'); };
 
 // ---- WebAudio: synthesized 45-loading sounds ----
 let AC = null;
