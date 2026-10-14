@@ -1,4 +1,37 @@
-﻿## jukebox-freeplay-enhanced - SKIP Button & 5-Second Countdown (2026-10-13)
+## jukebox-header-above-video - v1.6 (2026-10-13)
+
+### Summary
+Moved YouTube header bar from overlay position to above the video.
+
+### Key Changes
+- **Header Relocation**: Header bar now sits above video instead of overlaying
+- **Fixed Sizing**: Video maintains full 16:9 aspect ratio
+- **Better Visibility**: SKIP and X buttons fully visible without covering video
+
+### Technical Changes
+- `.video-screen`: Added `flex-direction: column` for vertical stacking
+- `.screen-header`: Changed from `position: absolute` to static flex item with `height: 45px`
+- `#yt-player-container`: Uses `height: calc(100% - 45px)` to fill remaining space
+
+### Files Modified
+- `public/jukebox.html` - Updated CSS for header positioning
+- `VERSION_HISTORY.md` - Added v1.6-header-above entry
+- `JUKEBOX_GUIDE.md` - Updated Free Play Mode section
+- `NOTES.md` - Added v1.6 summary
+
+### Backup Files Created
+- jukebox.html.v8_header_above_video_20261013 - Initial header-above layout
+- jukebox.html.v8a_header_above_fixed_size_20261013 - Fixed video sizing
+- jukebox.html.v9_final_header_above_20261013 - Final working copy
+
+### Validation
+- Header bar positioned above video (verified)
+- Video maintains full 16:9 size (verified)
+- SKIP and X buttons fully visible (verified)
+- No JavaScript errors in console (verified)
+
+---
+## jukebox-freeplay-enhanced - SKIP Button & 5-Second Countdown (2026-10-13)
 
 ### Features Added
 
