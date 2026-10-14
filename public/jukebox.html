@@ -21,10 +21,18 @@ html, body { width: 100%; height: 100%; overflow: hidden;
   letter-spacing: 3px; min-width: 200px; text-align: center;
   text-shadow: 0 0 8px #9fe870; }
 
-/* Flash animation for Free Play countdown */
+/* Flash animation for Free Play countdown - yellow pulse */
 @keyframes progFlash {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+  0%, 100% { 
+    opacity: 1; 
+    color: #9fe870;
+    text-shadow: 0 0 8px #9fe870;
+  }
+  50% { 
+    opacity: 1; 
+    color: #ffd700;
+    text-shadow: 0 0 12px #ffd700;
+  }
 }
 .progwin.flash {
   animation: progFlash 1s ease-in-out infinite;
