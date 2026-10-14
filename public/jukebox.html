@@ -21,6 +21,15 @@ html, body { width: 100%; height: 100%; overflow: hidden;
   letter-spacing: 3px; min-width: 200px; text-align: center;
   text-shadow: 0 0 8px #9fe870; }
 
+/* Flash animation for Free Play countdown */
+@keyframes progFlash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.progwin.flash {
+  animation: progFlash 1s ease-in-out infinite;
+}
+
 /* ============ The glass ============ */
 .rackwrap { flex: 1; min-height: 0; perspective: 1000px; padding: 8px 10px 0;
   position: relative; }
@@ -872,10 +881,7 @@ function ensureYtPlayer() {
           if (e.data === YT.PlayerState.ENDED) {
             stopYt(false);
             if (freePlayActive) {
-              setProg("FREE PLAY • NEXT SONG IN 15s");
-              freePlayTimer = setTimeout(() => {
-                if (freePlayActive) playNextFreePlayTrack();
-              }, FREEPLAY_GAP_MS);
+              startFreePlayCountdown();
             }
           }
           // Report play state to the parent dashboard so page rotation holds.
@@ -897,7 +903,7 @@ function startYt(track) {
   else ytPending = track.uri;
 }
 function stopYt(mode) {
-  // mode: 'close' = stop Free Play completely, 'skip' = continue Free Play with 15s timer
+  // mode: 'close' = stop Free Play completely, 'skip' = continue Free Play with 5s countdown
   notifyPlaying(false);
   if (ytPlayer && ytPlayer.stopVideo) { try { ytPlayer.stopVideo(); } catch (e) { /* player gone */ } }
   document.getElementById("video-screen").style.display = "none";
@@ -912,11 +918,8 @@ function stopYt(mode) {
   if (mode === 'close' && freePlayActive) {
     stopFreePlay();  // Stop Free Play completely when closing window
   } else if (mode === 'skip' && freePlayActive) {
-    // Start 15-second countdown to next song, keep Free Play running
-    setProg("FREE PLAY • NEXT SONG IN 15s");
-    freePlayTimer = setTimeout(() => {
-      if (freePlayActive) playNextFreePlayTrack();
-    }, FREEPLAY_GAP_MS);
+    // Start 5-second countdown with flashing, keep Free Play running
+    startFreePlayCountdown();
     return;  // Don't reset to "MAKE SELECTION" - show the countdown message
   }
   
@@ -1004,7 +1007,8 @@ function mechanicalSequence(done) {
 let freePlayActive = false;
 let freePlayQueue = [];
 let freePlayTimer = null;
-const FREEPLAY_GAP_MS = 15000; // 15 seconds between songs
+let freePlayCountdownInterval = null;  // For countdown flashing
+const FREEPLAY_GAP_MS = 5000; // 5 seconds between songs
 
 function toggleFreePlay() {
   if (freePlayActive) {
@@ -1037,9 +1041,52 @@ function stopFreePlay() {
     clearTimeout(freePlayTimer);
     freePlayTimer = null;
   }
+  if (freePlayCountdownInterval) {
+    clearInterval(freePlayCountdownInterval);
+    freePlayCountdownInterval = null;
+  }
+  // Remove flash class if present
+  const progEl = document.getElementById("prog");
+  progEl.classList.remove("flash");
   freePlayBtn.classList.remove("active");
   freePlayBtn.textContent = "FREE PLAY";
   setProg("MAKE SELECTION");
+}
+
+function startFreePlayCountdown() {
+  // Clear any existing countdown
+  if (freePlayCountdownInterval) {
+    clearInterval(freePlayCountdownInterval);
+    freePlayCountdownInterval = null;
+  }
+  if (freePlayTimer) {
+    clearTimeout(freePlayTimer);
+    freePlayTimer = null;
+  }
+  
+  let countdown = 5;
+  const progEl = document.getElementById("prog");
+  
+  // Add flash class for visual effect
+  progEl.classList.add("flash");
+  
+  // Show initial message
+  setProg(`FREE PLAY • NEXT SONG IN ${countdown}s`);
+  
+  // Flash the display every second with countdown
+  freePlayCountdownInterval = setInterval(() => {
+    countdown--;
+    if (countdown <= 0) {
+      // Countdown complete, play next song
+      clearInterval(freePlayCountdownInterval);
+      freePlayCountdownInterval = null;
+      progEl.classList.remove("flash");
+      if (freePlayActive) playNextFreePlayTrack();
+    } else {
+      // Update countdown display
+      setProg(`FREE PLAY • NEXT SONG IN ${countdown}s`);
+    }
+  }, 1000);
 }
 
 function playNextFreePlayTrack() {
