@@ -171,3 +171,65 @@ Next Song Starts immediately (skips remaining countdown)
 - [ ] Selection buttons do NOT skip during playback (normal selection)
 - [ ] Countdown clears properly when song ends
 - [ ] Skip button hides when Free Play stops
+
+---
+
+### Issue 5: Skip Button Implementation Fix
+**Location:** `public/jukebox.html` - Multiple locations
+
+**Problem:** The skip button was placed inside the `.classic-win` element which has:
+- Very small size (30-56px wide)
+- `overflow: hidden` - hides any content that doesn't fit
+- `display: none` - hidden by default
+- `position: absolute` - doesn't work well in this context
+
+This made the skip button invisible and caused JavaScript errors when trying to access it.
+
+**Fix:** 
+1. **Moved skip button to fixed overlay position** (lines 741-747):
+   ```javascript
+   // Skip button overlay (fixed position, visible during Free Play)
+   const skipBtnEl = document.createElement("button");
+   skipBtnEl.id = "skip-btn";
+   skipBtnEl.className = "skip-btn";
+   skipBtnEl.style.display = "none";
+   skipBtnEl.textContent = "SKIP SONG";
+   document.body.appendChild(skipBtnEl);
+   ```
+
+2. **Updated CSS positioning** (lines 168-206):
+   ```css
+   .skip-btn {
+     display: none;
+     position: fixed;
+     bottom: 20px;
+     right: 20px;
+     padding: 10px 20px;
+     background: linear-gradient(90deg, #b8860b 0%, #ffd700 50%, #b8860b 100%);
+     border: 2px solid #8b7355;
+     border-radius: 8px;
+     color: #211703;
+     font-family: "Courier New", monospace;
+     font-weight: bold;
+     font-size: 13px;
+     letter-spacing: 1px;
+     cursor: pointer;
+     box-shadow: 0 4px 8px rgba(0,0,0,0.8), 0 0 20px rgba(255,215,0,0.3);
+     z-index: 1000;
+     transition: all 0.2s ease;
+   }
+   .skip-btn.gap-mode {
+     background: linear-gradient(90deg, #228b22 0%, #32cd32 50%, #228b22 100%);
+     border-color: #006400;
+     bottom: 80px; /* Move up slightly during gap */
+   }
+   ```
+
+3. **Updated JavaScript references** (lines 1115-1260):
+   - Added `skipBtnEl` variable to track DOM element
+   - Updated all functions to use `skipBtnEl` instead of `skipBtn`
+   - Functions updated: `startFreePlay()`, `handleSkipClick()`, `updateSkipButtonState()`, `startCountdown()`, `hideSkipButton()`, `stopFreePlay()`
+
+**Result:** Skip button now appears in bottom-right corner during Free Play mode, shows "SKIP SONG" during playback, and changes to green "SKIP • 15s" during the 15-second gap between songs.
+
+---
