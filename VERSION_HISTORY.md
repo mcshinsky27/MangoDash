@@ -1,4 +1,73 @@
-﻿## v1.6-header-above (2026-10-13)
+## v10-zodiac-history (2026-10-13)
+**Feature: Wurlitzer Zodiac History Modal**
+
+### Changes
+
+**1. History Modal Added**
+- Click "MUSIC FOR MILLIONS" button to view Wurlitzer Zodiac history
+- Graphically styled modal with vintage aesthetics
+- Includes historical image of Wurlitzer Zodiac jukebox
+
+**2. Content Sections**
+- Musical Innovation overview
+- Interactive timeline (1959-Today)
+- Design features list
+- Heritage footer
+
+**3. Visual Features**
+- Golden border and accents
+- Timeline with year markers
+- Smooth modal animations
+- Close button with rotation effect
+
+### Backup Files Created
+- jukebox.html.v10_zodiac_history_20261013 - Final working copy
+
+### Validation
+- Modal opens on MFM button click (verified)
+- Image displays correctly (verified)
+- Timeline renders properly (verified)
+- Close button works (verified)
+- Escape key closes modal (verified)
+- Click outside closes modal (verified)
+
+---
+## v10-zodiac-history (2026-10-13)
+**Feature: Wurlitzer Zodiac History Modal**
+
+### Changes
+
+**1. History Modal Added**
+- Click "MUSIC FOR MILLIONS" button to view Wurlitzer Zodiac history
+- Graphically styled modal with vintage aesthetics
+- Includes historical image of Wurlitzer Zodiac jukebox
+
+**2. Content Sections**
+- Musical Innovation overview
+- Interactive timeline (1959-Today)
+- Design features list
+- Heritage footer
+
+**3. Visual Features**
+- Golden border and accents
+- Timeline with year markers
+- Smooth modal animations
+- Close button with rotation effect
+
+### Backup Files Created
+- jukebox.html.v10_zodiac_history_20261013 - Final working copy
+
+### Validation
+- Modal opens on MFM button click (verified)
+- Image displays correctly (verified)
+- Timeline renders properly (verified)
+- Close button works (verified)
+- Escape key closes modal (verified)
+- Click outside closes modal (verified)
+
+---
+
+## v1.6-header-above (2026-10-13)
 **Feature: YouTube Header Bar Positioned Above Video**
 
 ### Changes
