@@ -1735,7 +1735,13 @@ function initPlaylistSelector() {
         staticPlaylists.push(mergedNoahKahan);
       }
       
-      playlistMetadata = [...trending, ...staticPlaylists];
+      // Extract top two static playlists to display above trending
+      const topPlaylistIds = ["PLD0oAHhQ-W8Q", "PLf7pnPprL2f0"];
+      const topPlaylists = staticPlaylists.filter(p => topPlaylistIds.includes(p.id));
+      const remainingStaticPlaylists = staticPlaylists.filter(p => !topPlaylistIds.includes(p.id));
+      
+      // Display order: top playlists first, then trending, then remaining static playlists
+      playlistMetadata = [...topPlaylists, ...trending, ...remainingStaticPlaylists];
       customPlaylists = [];  // Reset custom playlists on refresh
       renderGrid(playlistMetadata);
       updateStats();
