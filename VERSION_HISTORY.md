@@ -48,6 +48,15 @@
 - Production backup before this change: `jukebox.html.bak-prebootmsg-20261016` (hash 502D34…FC37B = v18 final); production now hash 98E5A7…DC98B
 - Dev backup: `jukebox.html.bak-bootmsg-20261016` (hash 502D34…FC37B)
 
+### v18.2 — ADIMAB logo badge on the two ADIMAB playlists (2026-10-16)
+- Small ADIMAB wordmark (white letters + orange bird, from adimab.com) shown in the **top-right corner** of the two pinned playlists `PLD0oAHhQ-W8Q` and `PLf7pnPprL2f0`
+- Logo saved locally as `public/adimab-logo.svg` (10KB, downloaded once) — no external hotlink, works offline
+- New `ADIMAB_BADGE_IDS` constant drives the badge inside `renderGrid`; only those two tiles get it — all other static/trending/custom tiles unchanged
+- 16px tall, ~92% opacity, `pointer-events: none` (tile clicks unaffected); `:has(.adimab-badge)` pads the title area 64px so long names never run under the logo
+- Built and browser-verified on dev `:8081`; promoted to production same day (HTTP 200, all markers + SVG asset verified on `:8080`)
+- Production backup before this change: `jukebox.html.bak-adimab-20261016` (hash 98E5A7…DC98B = v18.1 final)
+- Dev backup: `jukebox.html.bak-adimab-20261016` (hash 98E5A7…DC98B)
+
 ### Fix 2026-10-16 (ignition robustness)
 - Root cause of "no visible ignition" on the dev machine: `prefers-reduced-motion: reduce` was active (Windows Animation effects off), and the first build killed the whole sequence with `animation: none`
 - Ignition sequence now gated on `.juke.boot` class in the markup (present at first paint, higher specificity, no JS dependency for the animation itself)

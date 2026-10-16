@@ -692,6 +692,7 @@ html, body { width: 100%; height: 100%; overflow: hidden;
   background: rgba(255,255,255,0.05); border: 1px solid rgba(201, 162, 39, 0.2);
   border-radius: 8px; padding: 12px; cursor: pointer;
   transition: all 0.2s ease; display: flex; align-items: center; gap: 12px;
+  position: relative;
 }
 .playlist-item:hover {
   background: rgba(201, 162, 39, 0.1); border-color: #c9a227;
@@ -726,6 +727,13 @@ html, body { width: 100%; height: 100%; overflow: hidden;
   padding: 1px 4px; border-radius: 3px; font-weight: bold;
   text-transform: uppercase;
 }
+/* ADIMAB logo badge: small top-right reference on the two ADIMAB playlists */
+.adimab-badge {
+  position: absolute; top: 7px; right: 9px; height: 16px; width: auto;
+  opacity: 0.92; pointer-events: none;
+}
+.adimab-badge img { height: 100%; width: auto; display: block; }
+.playlist-item:has(.adimab-badge) .playlist-info { padding-right: 64px; }
 .playlist-meta {
   color: #888; font-size: 10px; display: flex; gap: 10px;
 }
@@ -1792,6 +1800,9 @@ function initPlaylistSelector() {
     updateStats();
   };
 
+  // Playlists that get the small ADIMAB logo badge (top-right of tile)
+  const ADIMAB_BADGE_IDS = ["PLD0oAHhQ-W8Q", "PLf7pnPprL2f0"];
+
   const renderGrid = (playlists) => {
     grid.innerHTML = "";
     playlists.forEach(p => {
@@ -1807,6 +1818,7 @@ function initPlaylistSelector() {
           </div>
           <div class="playlist-meta">${p.trackCount || 0} tracks</div>
         </div>
+        ${ADIMAB_BADGE_IDS.includes(p.id) ? '<div class="adimab-badge" title="ADIMAB"><img src="adimab-logo.svg" alt="ADIMAB"></div>' : ''}
       `;
       item.onclick = () => {
         if (selectedIds.has(p.id)) selectedIds.delete(p.id);
