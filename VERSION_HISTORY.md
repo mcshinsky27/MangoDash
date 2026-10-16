@@ -40,6 +40,14 @@
 - Pre-promotion production backup: `C:\MangoDash\public\jukebox.html.bak-prev18promote-20261016` (hash C1C669…3B25 = v17 promoted state)
 - Production file now byte-identical to dev final checkpoint (hash 502D34…FC37B)
 
+### v18.1 — Boot message + extended startup (2026-10-16)
+- Startup sequence stretched ~2.9s → ~4s (longer staggered flicker)
+- New boot message overlaid on the dark opening: green glowing monospace **`starting up the wurlitzer▌`** with blinking block cursor — tells viewers the dark opening is intentional, not a page stall
+- Message fades in at ~0.25s while cabinet is black, fades out ~3.4–4.0s as the last neon lands; `pointer-events: none`, `visibility: hidden` after fade (zero interaction impact)
+- Dev tested on `:8081`; promoted to production same day (HTTP 200, all markers verified on `:8080`)
+- Production backup before this change: `jukebox.html.bak-prebootmsg-20261016` (hash 502D34…FC37B = v18 final); production now hash 98E5A7…DC98B
+- Dev backup: `jukebox.html.bak-bootmsg-20261016` (hash 502D34…FC37B)
+
 ### Fix 2026-10-16 (ignition robustness)
 - Root cause of "no visible ignition" on the dev machine: `prefers-reduced-motion: reduce` was active (Windows Animation effects off), and the first build killed the whole sequence with `animation: none`
 - Ignition sequence now gated on `.juke.boot` class in the markup (present at first paint, higher specificity, no JS dependency for the animation itself)

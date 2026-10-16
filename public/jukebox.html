@@ -71,16 +71,33 @@ html, body { width: 100%; height: 100%; overflow: hidden;
   100% { opacity: 1;   filter: brightness(1); }
 }
 /* Staggered neon wake-up: walls, left neon, green readout, right neon,
-   back wall, song board, then the keypad (~3s total). */
-.juke.boot::before, .juke.boot::after { animation: ignite .9s ease-out backwards; }
-.juke.boot::after { animation-delay: .2s; }
-.juke.boot .marquee .mfm, .juke.boot .marquee .progwin { animation: ignite 1s ease-out backwards; }
-.juke.boot .marquee .mfm:nth-of-type(1) { animation-delay: .3s; }
-.juke.boot .marquee .progwin            { animation-delay: .65s; }
-.juke.boot .marquee .mfm:nth-of-type(3) { animation-delay: 1s; }
-.juke.boot .cabback { animation: ignite 1.2s 1.3s ease-out backwards; }
-.juke.boot .rack    { animation: ignite 1.3s 1.45s ease-out backwards; }
-.juke.boot .keys    { animation: ignite 1s 1.85s ease-out backwards; }
+   back wall, song board, then the keypad (~4s total). */
+.juke.boot::before, .juke.boot::after { animation: ignite 1s ease-out backwards; }
+.juke.boot::after { animation-delay: .35s; }
+.juke.boot .marquee .mfm, .juke.boot .marquee .progwin { animation: ignite 1.15s ease-out backwards; }
+.juke.boot .marquee .mfm:nth-of-type(1) { animation-delay: .5s; }
+.juke.boot .marquee .progwin            { animation-delay: 1s; }
+.juke.boot .marquee .mfm:nth-of-type(3) { animation-delay: 1.5s; }
+.juke.boot .cabback { animation: ignite 1.3s 2s ease-out backwards; }
+.juke.boot .rack    { animation: ignite 1.4s 2.3s ease-out backwards; }
+.juke.boot .keys    { animation: ignite 1.1s 2.9s ease-out backwards; }
+/* Boot message: tells the viewer the dark opening is a show, not a stall.
+   Fades in while the cabinet is black, out as the last neon lands. */
+@keyframes bootMsgIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes bootMsgOut { to   { opacity: 0; visibility: hidden; } }
+@keyframes curBlink   { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+.bootmsg {
+  position: absolute; inset: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
+  font-family: "Courier New", Courier, monospace;
+  font-size: clamp(13px, 2.4vw, 22px);
+  letter-spacing: .3em;
+  color: #9fe870;
+  text-shadow: 0 0 8px rgba(159,232,112,.85), 0 0 24px rgba(159,232,112,.5);
+  animation: bootMsgIn .5s .25s both, bootMsgOut .6s 3.4s both;
+}
+.bootmsg .cur { margin-left: .2em; animation: curBlink 1s steps(1) infinite; }
 /* Deliberately NOT gated on prefers-reduced-motion - the power-on show is
    the point of the cabinet (owner decision 2026-10-16). */
 
@@ -921,6 +938,7 @@ html, body { width: 100%; height: 100%; overflow: hidden;
 
 </style></head><body>
 <div class="juke boot">
+  <div class="bootmsg">starting up the wurlitzer<span class="cur">&#9614;</span></div>
   <div class="marquee">
     <div class="mfm">MUSIC FOR MILLIONS</div>
     <div class="progwin" id="prog">MAKE SELECTION</div>
