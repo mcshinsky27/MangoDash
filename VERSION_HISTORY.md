@@ -1,3 +1,87 @@
+## v18-ignition-songchoreo (2026-10-15)
+**Feature: Power-on ignition sequence + song-change choreography**
+
+### Status
+- Built and verified on dev (`C:\MangoDash-dev`, port 8081). **Not yet promoted to production.**
+
+### Power-on Ignition (CSS only)
+- One-shot boot sequence on page load: chrome side-walls → left "MUSIC FOR MILLIONS" neon → green progress window → right "WURLITZER ✳ ZODIAC" → cabinet back wall → song board → keypad
+- Neon-flicker dip in the `ignite` keyframe (dim → re-brighten) mimics a real lamp warming up
+- Staggered via `animation-delay` + `animation-fill-mode: backwards` — zero JS
+- `prefers-reduced-motion: reduce` disables the sequence entirely
+
+### Song-Change Choreography
+- New `songChangePulse()`: one-shot `.changing` class on `.juke` (1.5s window, reflow-retriggered so back-to-back selections replay)
+  - Cabinet back-wall brightness **thump** (`cabThump`, peaks 2.0) as the board slants back
+  - ZODIAC crest **bounce** (`crestThump`, scale 1.14) on the revealed band
+- Mechanism record window now actually reveals: `.mech.on .win` drops in from above with a springy `winDrop` (delayed .35s so the slant leads); the 45 fades onto the platter (`discIn`) while spinning at 33rpm
+- Selected track card flashes bright (`cardFlash`) when it gains `.playing`
+- Spotify remote-poll path fires the same ceremony when a new track appears from a paired device (`lastPollTrack` change detection), and resets on stop
+
+### Notes
+- Latent gap fixed: `.mech .win` was `display: none` with no rule ever showing it — the record window was invisible in all previous versions
+- JS additions are ceremony-only (class toggles + one poll-state variable); no playback logic touched
+
+### Tuning Knobs
+- Ignition pacing: delays in the `.marquee .mfm / .progwin / .cabback / .rack / .keys` rules (0.3s → 1.85s)
+- Thump strength: `cabThump` 30% keyframe (`brightness(2)`)
+- Drop spring: `winDrop` `cubic-bezier(.34,1.56,.64,1)` and `.35s` delay
+
+### Validation
+- `node --check` on extracted script: OK
+- Dev :8081 serves HTTP 200 with all 8 new markers (`ignite`, `winDrop`, `cabThump`, `crestThump`, `cardFlash`, `discIn`, `songChangePulse`, `let lastPollTrack`)
+
+### Backup Files Created
+- jukebox.html.v18_ignition_songchoreo_20261015 — pre-edit checkpoint (= v17 promoted state, hash C1C669…3B25)
+- jukebox.html.bak-preignitefix-20261016 — state before the ignition robustness fix (hash 7CEA3D…5763)
+
+### ✅ VERIFIED in browser 2026-10-16 — ignition confirmed by owner ("that worked").
+### 🚀 PROMOTED to production 2026-10-16 — `:8080` verified serving v18 (HTTP 200, all markers present).
+- Pre-promotion production backup: `C:\MangoDash\public\jukebox.html.bak-prev18promote-20261016` (hash C1C669…3B25 = v17 promoted state)
+- Production file now byte-identical to dev final checkpoint (hash 502D34…FC37B)
+
+### Fix 2026-10-16 (ignition robustness)
+- Root cause of "no visible ignition" on the dev machine: `prefers-reduced-motion: reduce` was active (Windows Animation effects off), and the first build killed the whole sequence with `animation: none`
+- Ignition sequence now gated on `.juke.boot` class in the markup (present at first paint, higher specificity, no JS dependency for the animation itself)
+- New load-time console diagnostic: `[ZODIAC v18] HH:MM:SS | reduced-motion: … | ignition: RUNNING (N animations)` — one line tells you exactly what the page did on load
+- **Owner decision (2026-10-16): full staggered flicker is FORCED regardless of `prefers-reduced-motion`** — no media-query fallback for the ignition (noted in-CSS). A gentle `bootFade` fallback was briefly added, then removed with this decision
+- Backup of the state before the force-ignite change: `jukebox.html.bak-forceignite-20261016` (hash 4C86F0…D7B49)
+
+---
+## v17-3d-zodiac-cabback (2026-10-15)
+**Feature: Full 3D depth treatment + ZODIAC cabinet back wall with ambient color drift**
+
+### Status
+- **Promoted to production** 2026-10-15 23:43 (`Backup/promote-2026-10-15_23-43-38`); production :8080 hash-verified against dev.
+
+### 3D Depth Overhaul (CSS only)
+- Cabinet: chrome side-wall trim, section joint shadows, darker cabinet base
+- Marquee: MFM badges and progress window raised beveled bezels over deep inset screens; hover glow keeps bevel, click presses down
+- Song board: **vertical (0deg) at rest**; existing 28deg slant-back on playback unchanged; track cards lift on hover / press in on click; brass rails with cylindrical shading, recessed letter tabs
+- Keypad: 5deg lean toward operator, real keycap thickness (deeper pedestal, hover lift, full press-down), chrome specular trim, coin slot plate with depth
+- Mechanism window: beveled steel frame, deeper recess
+
+### ZODIAC Back Wall (revealed when the board slants back)
+- New `.cabback` layer behind the rack: dark cabinet interior, chrome lip at the opening
+- Glowing sun crest + ZODIAC wordmark centered in the revealed band
+- Cabinet lamp brightens while slanted via pure CSS `:has(.rack.slanted)` — zero JS changes
+- Ambient glow slowly drifts through the spectrum: gold → coral → magenta → violet → blue → teal → green → gold (75s cycle, ~32% opacity, radial-masked)
+
+### Tuning Knobs
+- Fade speed: `75s` in `@keyframes cabfade` animation
+- Glow intensity: `opacity: .32` on `.cabback::after`
+- Crest position/size: `.cabback-crest` top / `clamp()` sizes
+
+### Validation
+- Dev :8081 serves all new CSS/markup markers; production :8080 verified untouched
+- All changes CSS-only; no JS logic touched
+
+### Backup Files Created
+- jukebox.html.v17_3d_zodiac_cabback_20261015 — current (3D + ZODIAC cabback + color drift)
+- jukebox.html.bak-3d-2026-10-15 — 3D version prior to the ZODIAC back wall
+- jukebox.html.bak — pre-3D version
+
+---
 ## v11-zodiac-history-fix (2026-10-13)
 **Fix: Separate Wurlitzer Zodiac History Modal from Playlist Selector**
 
